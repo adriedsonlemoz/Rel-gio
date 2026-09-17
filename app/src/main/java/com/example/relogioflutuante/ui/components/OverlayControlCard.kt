@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.overlay.OverlayCapability
 import com.example.relogioflutuante.state.OverlayMode
+import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.ui.theme.AppColors
 
 @Composable
@@ -29,11 +30,12 @@ fun OverlayControlCard(
     capability: OverlayCapability,
     notificationsAllowed: Boolean,
     enabled: Boolean,
-    notificationOnly: Boolean,
+    presentation: OverlayPresentation,
     mode: OverlayMode,
     onModeChange: (OverlayMode) -> Unit,
-    onEnableOverlay: () -> Unit,
-    onEnableCompatibleMode: () -> Unit,
+    onEnableSystemOverlay: () -> Unit,
+    onEnableAccessibilityOverlay: () -> Unit,
+    onEnableNotificationMode: () -> Unit,
     onDisable: () -> Unit
 ) {
     Card(
@@ -50,10 +52,10 @@ fun OverlayControlCard(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                if (capability.shouldPreferCompatibleMode) {
-                    "Este aparelho bloqueia janelas flutuantes. O modo compatível mantém a informação em uma notificação persistente."
+                if (capability.isLowRamDevice && !capability.canDrawOverlays) {
+                    "A permissão tradicional está bloqueada. Use a sobreposição por Acessibilidade para manter os segundos visíveis dentro do jogo."
                 } else {
-                    "Use uma janela compacta e móvel ou o modo compatível por notificação."
+                    "Use a janela compacta sobre outros aplicativos. Acessibilidade fica disponível como alternativa."
                 },
                 color = AppColors.TextSecondary,
                 fontSize = 13.sp,
@@ -78,13 +80,19 @@ fun OverlayControlCard(
 
             Spacer(Modifier.height(14.dp))
             StatusLine(
-                label = "Janela flutuante",
+                label = "Sobreposição normal",
                 value = when {
                     capability.canDrawOverlays -> "Disponível"
                     capability.isLowRamDevice -> "Bloqueada pelo sistema"
                     else -> "Permissão necessária"
                 },
                 good = capability.canDrawOverlays
+            )
+            Spacer(Modifier.height(7.dp))
+            StatusLine(
+                label = "Acessibilidade",
+                value = if (capability.accessibilityServiceEnabled) "Ativada" else "Desativada",
+                good = capability.accessibilityServiceEnabled
             )
             Spacer(Modifier.height(7.dp))
             StatusLine(
@@ -97,8 +105,9 @@ fun OverlayControlCard(
                 label = "Estado",
                 value = when {
                     !enabled -> "Desativado"
-                    notificationOnly -> "Modo compatível"
-                    else -> "Janela ativa"
+                    presentation == OverlayPresentation.ACCESSIBILITY_OVERLAY -> "Janela via Acessibilidade"
+                    presentation == OverlayPresentation.NOTIFICATION -> "Somente notificação"
+                    else -> "Janela normal ativa"
                 },
                 good = enabled
             )
@@ -107,29 +116,38 @@ fun OverlayControlCard(
             if (!enabled) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = if (capability.shouldPreferCompatibleMode) {
-                        onEnableCompatibleMode
-                    } else {
-                        onEnableOverlay
+                    onClick = when {
+                        capability.canDrawOverlays -> onEnableSystemOverlay
+                        capability.isLowRamDevice -> onEnableAccessibilityOverlay
+                        else -> onEnableSystemOverlay
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
                 ) {
                     Text(
                         when {
-                            capability.shouldPreferCompatibleMode -> "Ativar modo compatível"
                             capability.canDrawOverlays -> "Ativar janela flutuante"
+                            capability.isLowRamDevice && capability.accessibilityServiceEnabled -> "Ativar via Acessibilidade"
+                            capability.isLowRamDevice -> "Configurar Acessibilidade"
                             else -> "Conceder permissão e ativar"
                         }
                     )
                 }
 
-                if (!capability.canDrawOverlays && !capability.shouldPreferCompatibleMode) {
+                if (!capability.canDrawOverlays && capability.isLowRamDevice) {
                     Spacer(Modifier.height(8.dp))
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = onEnableCompatibleMode
+                        onClick = onEnableNotificationMode
                     ) {
-                        Text("Usar modo compatível")
+                        Text("Usar somente notificação")
+                    }
+                } else if (!capability.canDrawOverlays || capability.accessibilityServiceEnabled) {
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onEnableAccessibilityOverlay
+                    ) {
+                        Text("Usar Acessibilidade")
                     }
                 }
             } else {

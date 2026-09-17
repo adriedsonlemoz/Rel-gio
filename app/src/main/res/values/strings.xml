@@ -2,4 +2,6 @@
     <string name="app_name">Relógio Flutuante</string>
     <string name="overlay_channel_name">Relógio sobre outros apps</string>
     <string name="overlay_channel_description">Mantém o relógio ou a contagem regressiva visível sobre outros aplicativos.</string>
+    <string name="accessibility_service_name">Relógio Flutuante sobre apps</string>
+    <string name="accessibility_service_description">Exibe apenas o relógio ou a contagem regressiva em uma pequena janela sobre outros aplicativos. Não lê o conteúdo da tela e não executa cliques ou gestos.</string>
 </resources>

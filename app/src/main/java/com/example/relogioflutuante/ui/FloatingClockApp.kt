@@ -1,13 +1,5 @@
 package com.example.relogioflutuante.ui
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -20,24 +12,18 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.example.relogioflutuante.overlay.OverlayCapabilityDetector
-import com.example.relogioflutuante.overlay.OverlayService
-import com.example.relogioflutuante.state.OverlayState
 import com.example.relogioflutuante.ui.screens.ClockScreen
 import com.example.relogioflutuante.ui.screens.CountdownScreen
 import com.example.relogioflutuante.ui.screens.OverlayScreen
@@ -51,68 +37,8 @@ private enum class MainSection(val label: String, val glyph: String) {
 
 @Composable
 fun FloatingClockApp() {
-    val context = LocalContext.current
     var section by remember { mutableStateOf(MainSection.CLOCK) }
-    var pendingOverlayEnable by remember { mutableStateOf(false) }
-    var pendingNotificationOnly by remember { mutableStateOf(false) }
-    var permissionRefresh by remember { mutableIntStateOf(0) }
-
-    fun startService(notificationOnly: Boolean) {
-        OverlayState.setNotificationOnly(context, notificationOnly)
-        ContextCompat.startForegroundService(context, Intent(context, OverlayService::class.java))
-    }
-
-    val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        permissionRefresh++
-        if (granted || !pendingNotificationOnly) {
-            startService(pendingNotificationOnly)
-        }
-    }
-
-    fun requestNotificationAndStart(notificationOnly: Boolean) {
-        pendingNotificationOnly = notificationOnly
-        val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-
-        if (needsPermission) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            startService(notificationOnly)
-        }
-    }
-
-    val overlayPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        permissionRefresh++
-        if (pendingOverlayEnable) {
-            pendingOverlayEnable = false
-            val capability = OverlayCapabilityDetector.read(context)
-            requestNotificationAndStart(notificationOnly = !capability.canDrawOverlays)
-        }
-    }
-
-    fun requestEnableOverlay() {
-        val capability = OverlayCapabilityDetector.read(context)
-        when {
-            capability.canDrawOverlays -> requestNotificationAndStart(notificationOnly = false)
-            capability.shouldPreferCompatibleMode -> requestNotificationAndStart(notificationOnly = true)
-            else -> {
-                pendingOverlayEnable = true
-                overlayPermissionLauncher.launch(
-                    Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:${context.packageName}")
-                    )
-                )
-            }
-        }
-    }
+    val overlayActivation = rememberOverlayActivationController()
 
     Scaffold(
         modifier = Modifier
@@ -151,11 +77,10 @@ fun FloatingClockApp() {
                     MainSection.CLOCK -> ClockScreen()
                     MainSection.COUNTDOWN -> CountdownScreen()
                     MainSection.OVERLAY -> OverlayScreen(
-                        permissionRefresh = permissionRefresh,
-                        onEnableOverlay = ::requestEnableOverlay,
-                        onEnableCompatibleMode = {
-                            requestNotificationAndStart(notificationOnly = true)
-                        }
+                        permissionRefresh = overlayActivation.permissionRefresh,
+                        onEnableSystemOverlay = overlayActivation.enableSystemOverlay,
+                        onEnableAccessibilityOverlay = overlayActivation.enableAccessibilityOverlay,
+                        onEnableNotificationMode = overlayActivation.enableNotificationMode
                     )
                 }
             }

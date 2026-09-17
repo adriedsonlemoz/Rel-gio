@@ -11,6 +11,7 @@ import com.example.relogioflutuante.MainActivity
 import com.example.relogioflutuante.R
 import com.example.relogioflutuante.state.CountdownSnapshot
 import com.example.relogioflutuante.state.OverlayMode
+import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
 
 class OverlayNotificationManager(private val context: Context) {
@@ -36,7 +37,7 @@ class OverlayNotificationManager(private val context: Context) {
         val builder = Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(
-                if (OverlayState.notificationOnly(context)) {
+                if (OverlayState.presentation(context) == OverlayPresentation.NOTIFICATION) {
                     "Relógio Flutuante · modo compatível"
                 } else {
                     "Relógio Flutuante"

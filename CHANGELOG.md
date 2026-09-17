@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.7
+
+- Adicionada sobreposição alternativa por `AccessibilityService` com `TYPE_ACCESSIBILITY_OVERLAY`.
+- O novo modo permite manter relógio ou contagem sobre o jogo em aparelhos que bloqueiam `SYSTEM_ALERT_WINDOW`.
+- O serviço de Acessibilidade não solicita conteúdo das janelas (`canRetrieveWindowContent=false`), ignora eventos recebidos e não executa cliques ou gestos.
+- A tela Sobrepor agora mostra separadamente disponibilidade da sobreposição normal, Acessibilidade e notificações.
+- Em aparelhos low-RAM com a permissão tradicional bloqueada, o botão principal direciona para configurar a Acessibilidade em vez da tela indisponível de sobreposição.
+- Depois de ativado o serviço de Acessibilidade, a janela pode ser ligada e desligada pelo próprio app sem reabrir as configurações.
+- A janela por Acessibilidade reutiliza o mesmo estado, modo, posição, arraste e fechamento rápido do overlay normal.
+- O modo por notificação foi mantido como fallback secundário.
+- Janela flutuante ligeiramente compactada para ocupar menos espaço sobre o jogo.
+- Tickers dos serviços realinhados à próxima virada de segundo para reduzir deriva visual.
+- Atualizados README, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.6
 
 - Adicionado modo compatível para aparelhos low-RAM/Android Go que bloqueiam a permissão de sobreposição.

@@ -4,12 +4,19 @@ import android.content.Context
 
 enum class OverlayMode { CLOCK, COUNTDOWN }
 
+enum class OverlayPresentation {
+    SYSTEM_OVERLAY,
+    ACCESSIBILITY_OVERLAY,
+    NOTIFICATION
+}
+
 object OverlayState {
     private const val KEY_ENABLED = "overlay_enabled"
     private const val KEY_MODE = "overlay_mode"
     private const val KEY_X = "overlay_x"
     private const val KEY_Y = "overlay_y"
-    private const val KEY_NOTIFICATION_ONLY = "overlay_notification_only"
+    private const val KEY_PRESENTATION = "overlay_presentation"
+    private const val LEGACY_KEY_NOTIFICATION_ONLY = "overlay_notification_only"
 
     fun isEnabled(context: Context): Boolean =
         context.appPreferences().getBoolean(KEY_ENABLED, false)
@@ -28,12 +35,32 @@ object OverlayState {
         context.appPreferences().edit().putString(KEY_MODE, mode.name).apply()
     }
 
-    fun notificationOnly(context: Context): Boolean =
-        context.appPreferences().getBoolean(KEY_NOTIFICATION_ONLY, false)
-
-    fun setNotificationOnly(context: Context, enabled: Boolean) {
-        context.appPreferences().edit().putBoolean(KEY_NOTIFICATION_ONLY, enabled).apply()
+    fun presentation(context: Context): OverlayPresentation {
+        val prefs = context.appPreferences()
+        val stored = prefs.getString(KEY_PRESENTATION, null)
+        if (stored != null) {
+            return runCatching { OverlayPresentation.valueOf(stored) }
+                .getOrDefault(OverlayPresentation.SYSTEM_OVERLAY)
+        }
+        return if (prefs.getBoolean(LEGACY_KEY_NOTIFICATION_ONLY, false)) {
+            OverlayPresentation.NOTIFICATION
+        } else {
+            OverlayPresentation.SYSTEM_OVERLAY
+        }
     }
+
+    fun setPresentation(context: Context, presentation: OverlayPresentation) {
+        context.appPreferences().edit()
+            .putString(KEY_PRESENTATION, presentation.name)
+            .putBoolean(
+                LEGACY_KEY_NOTIFICATION_ONLY,
+                presentation == OverlayPresentation.NOTIFICATION
+            )
+            .apply()
+    }
+
+    fun notificationOnly(context: Context): Boolean =
+        presentation(context) == OverlayPresentation.NOTIFICATION
 
     fun position(context: Context): Pair<Int, Int> =
         context.appPreferences().getInt(KEY_X, 24) to

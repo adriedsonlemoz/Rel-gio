@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.relogioflutuante.overlay.OverlayCapabilityDetector
 import com.example.relogioflutuante.overlay.OverlayService
+import com.example.relogioflutuante.state.OverlayMode
+import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
 import com.example.relogioflutuante.ui.components.InfoCard
 import com.example.relogioflutuante.ui.components.OverlayControlCard
@@ -30,14 +32,15 @@ import kotlinx.coroutines.delay
 
 private data class OverlayRuntimeState(
     val enabled: Boolean,
-    val notificationOnly: Boolean
+    val presentation: OverlayPresentation
 )
 
 @Composable
 fun OverlayScreen(
     permissionRefresh: Int,
-    onEnableOverlay: () -> Unit,
-    onEnableCompatibleMode: () -> Unit
+    onEnableSystemOverlay: () -> Unit,
+    onEnableAccessibilityOverlay: () -> Unit,
+    onEnableNotificationMode: () -> Unit
 ) {
     val context = LocalContext.current
     val capability = remember(permissionRefresh) { OverlayCapabilityDetector.read(context) }
@@ -53,13 +56,13 @@ fun OverlayScreen(
     val runtimeState by produceState(
         initialValue = OverlayRuntimeState(
             OverlayState.isEnabled(context),
-            OverlayState.notificationOnly(context)
+            OverlayState.presentation(context)
         )
     ) {
         while (true) {
             value = OverlayRuntimeState(
                 OverlayState.isEnabled(context),
-                OverlayState.notificationOnly(context)
+                OverlayState.presentation(context)
             )
             delay(1_000L)
         }
@@ -75,28 +78,27 @@ fun OverlayScreen(
             capability = capability,
             notificationsAllowed = notificationsAllowed,
             enabled = runtimeState.enabled,
-            notificationOnly = runtimeState.notificationOnly,
+            presentation = runtimeState.presentation,
             mode = mode,
             onModeChange = {
                 mode = it
                 OverlayState.setMode(context, it)
             },
-            onEnableOverlay = onEnableOverlay,
-            onEnableCompatibleMode = onEnableCompatibleMode,
+            onEnableSystemOverlay = onEnableSystemOverlay,
+            onEnableAccessibilityOverlay = onEnableAccessibilityOverlay,
+            onEnableNotificationMode = onEnableNotificationMode,
             onDisable = {
-                context.startService(
-                    Intent(context, OverlayService::class.java)
-                        .setAction(OverlayService.ACTION_STOP)
-                )
+                OverlayState.setEnabled(context, false)
+                context.stopService(Intent(context, OverlayService::class.java))
             }
         )
 
         Spacer(Modifier.height(12.dp))
         InfoCard(
-            if (capability.shouldPreferCompatibleMode) {
-                "No modo compatível, relógio ou contagem continuam funcionando fora do app pela notificação. Na contagem, a própria notificação oferece iniciar, pausar ou continuar."
+            if (capability.isLowRamDevice && !capability.canDrawOverlays) {
+                "A opção por Acessibilidade cria a pequena janela sem usar a permissão ‘Sobrepor a outros apps’. Este serviço não lê o conteúdo da tela e não executa cliques ou gestos; ele só desenha o relógio ou a contagem."
             } else {
-                "A janela flutuante não bloqueia toques fora dela. Se o Android impedir a sobreposição, use o modo compatível sem precisar de root ou ADB."
+                "A janela só captura toque dentro do próprio relógio para arrastar ou fechar. O restante da tela e do jogo continua recebendo os toques normalmente."
             }
         )
     }

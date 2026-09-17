@@ -12,10 +12,12 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Aviso ao chegar a zero.
 - Estado persistente compartilhado entre app e overlay.
 - Overlay compacto, arrastável e com fechamento rápido.
-- Modo compatível para aparelhos que bloqueiam sobreposição: relógio ou contagem permanecem visíveis em notificação persistente.
-- Controles rápidos da contagem pela notificação no modo compatível.
+- Segundo método de sobreposição por Serviço de Acessibilidade usando `TYPE_ACCESSIBILITY_OVERLAY`, pensado para aparelhos que bloqueiam `SYSTEM_ALERT_WINDOW`.
+- O serviço de Acessibilidade não solicita conteúdo das janelas e não executa cliques ou gestos; ele apenas desenha o relógio/contagem.
+- Modo por notificação mantido como último fallback.
+- Controles rápidos da contagem pela notificação quando esse fallback é usado.
 - Permissão `SYSTEM_ALERT_WINDOW` solicitada pela tela oficial do Android.
-- Serviço em primeiro plano do tipo `specialUse` enquanto o overlay está ativo.
+- Serviço em primeiro plano do tipo `specialUse` para o overlay normal e o fallback por notificação; o modo por Acessibilidade usa o serviço do sistema correspondente.
 - Layout adaptável para celulares e telas maiores.
 
 ## Requisitos de build
@@ -27,17 +29,17 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Jetpack Compose BOM 2026.06.00 (linha Compose 1.11.x, compatível com compileSdk 36).
 - AndroidX Core KTX 1.17.0 para manter compatibilidade com API 36.
 
-## Comportamento do overlay e modo compatível
+## Comportamento do overlay
 
 Quando o aparelho permite sobreposição, a janela usa `TYPE_APPLICATION_OVERLAY`. Os toques fora dela continuam chegando ao aplicativo que estiver embaixo. A própria janela recebe toques apenas para arrastar e fechar.
 
-Em aparelhos low-RAM/Android Go que bloqueiam `SYSTEM_ALERT_WINDOW`, o aplicativo evita abrir repetidamente a tela de permissão indisponível e oferece automaticamente o modo compatível. Nesse modo, relógio ou contagem continuam fora do app por uma notificação persistente do serviço em primeiro plano. A contagem oferece ação rápida de iniciar, pausar ou continuar.
+Em aparelhos low-RAM/Android Go que bloqueiam `SYSTEM_ALERT_WINDOW`, o app oferece a sobreposição por Acessibilidade. Depois de o usuário ativar o serviço nas configurações do Android, a janela usa `TYPE_ACCESSIBILITY_OVERLAY`, sem precisar da permissão tradicional de “Sobrepor a outros apps”. O serviço está configurado com `canRetrieveWindowContent=false`, ignora eventos de acessibilidade e não implementa gestos ou cliques.
 
-No Android 13+, a permissão de notificações é necessária para que o modo compatível apareça corretamente na área de notificações.
+O modo por notificação continua disponível apenas como fallback. No Android 13+, `POST_NOTIFICATIONS` pode ser necessário para esse modo.
 
 ## Desempenho
 
-Os atualizadores de relógio, contagem e serviço trabalham em cadência de 1 segundo, adequada à precisão visual `HH:mm:ss`. A versão anterior atualizava entre 5 e 10 vezes por segundo, causando recomposições, leituras de preferências e redesenhos desnecessários. O serviço também evita atualizar texto e notificação quando o conteúdo exibido não mudou.
+Os atualizadores trabalham no máximo uma vez por segundo. Os serviços de sobreposição agora realinham a próxima atualização à virada do segundo do relógio do sistema, reduzindo deriva visual. O serviço também evita redesenhar texto e notificação quando o conteúdo exibido não mudou.
 
 ## Observação
 
@@ -52,8 +54,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualm
 
 ### Versão atual
 
-- `versionName`: `1.0.6`
-- `versionCode`: `7`
+- `versionName`: `1.0.7`
+- `versionCode`: `8`
 - APK: `Relogio-Flutuante.apk`
 
 ## Organização do código
@@ -64,7 +66,7 @@ O projeto foi fatorado desde a base para evitar arquivos monolíticos conforme n
 - `ui/components/`: componentes reutilizáveis, cartões, campos, controles de overlay e diálogos.
 - `ui/theme/`: tema e paleta visual.
 - `state/`: estado persistente do relógio, contagem e overlay.
-- `overlay/`: serviço, detecção de compatibilidade, controle da janela flutuante, arraste e notificações.
+- `overlay/`: serviços de overlay normal e por Acessibilidade, detecção de compatibilidade, controle da janela, arraste e notificações.
 - `MainActivity.kt`: apenas ponto de entrada do aplicativo.
 
 A recomendação para novas funções é manter cada responsabilidade no pacote correspondente e evitar concentrar lógica de estado diretamente nas telas.

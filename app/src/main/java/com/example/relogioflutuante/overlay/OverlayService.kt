@@ -12,6 +12,7 @@ import com.example.relogioflutuante.state.ClockState
 import com.example.relogioflutuante.state.CountdownSnapshot
 import com.example.relogioflutuante.state.CountdownState
 import com.example.relogioflutuante.state.OverlayMode
+import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
 import com.example.relogioflutuante.state.formatDuration
 
@@ -26,19 +27,23 @@ class OverlayService : Service() {
     private val ticker = object : Runnable {
         override fun run() {
             updatePresentation()
-            handler.postDelayed(this, TICK_MS)
+            scheduleNextTick()
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        windowController = OverlayWindowController(this) { stopSelf() }
+        windowController = OverlayWindowController(this) {
+            OverlayState.setEnabled(this, false)
+            stopSelf()
+        }
         notifications = OverlayNotificationManager(this).also { it.createChannel() }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> {
+                OverlayState.setEnabled(this, false)
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -47,30 +52,40 @@ class OverlayService : Service() {
             ACTION_START_COUNTDOWN -> CountdownState.start(this)
         }
 
+        if (OverlayState.presentation(this) == OverlayPresentation.ACCESSIBILITY_OVERLAY) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         OverlayState.setEnabled(this, true)
         startForegroundCompat(initialNotificationText())
         ensureCorrectPresentationMode()
         updatePresentation(force = true)
         handler.removeCallbacks(ticker)
-        handler.postDelayed(ticker, TICK_MS)
+        scheduleNextTick()
         return START_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun ensureCorrectPresentationMode() {
-        if (!Settings.canDrawOverlays(this) && !OverlayState.notificationOnly(this)) {
-            OverlayState.setNotificationOnly(this, true)
-        }
-        if (OverlayState.notificationOnly(this)) {
-            windowController.hide()
-        } else if (!windowController.ensureVisible()) {
-            OverlayState.setNotificationOnly(this, true)
-            windowController.hide()
+        when (OverlayState.presentation(this)) {
+            OverlayPresentation.SYSTEM_OVERLAY -> {
+                if (!Settings.canDrawOverlays(this) || !windowController.ensureVisible()) {
+                    OverlayState.setPresentation(this, OverlayPresentation.NOTIFICATION)
+                    windowController.hide()
+                }
+            }
+            OverlayPresentation.NOTIFICATION -> windowController.hide()
+            OverlayPresentation.ACCESSIBILITY_OVERLAY -> windowController.hide()
         }
     }
 
     private fun updatePresentation(force: Boolean = false) {
+        if (OverlayState.presentation(this) == OverlayPresentation.ACCESSIBILITY_OVERLAY) {
+            stopSelf()
+            return
+        }
         ensureCorrectPresentationMode()
         when (OverlayState.mode(this)) {
             OverlayMode.CLOCK -> updateClock(force)
@@ -80,7 +95,9 @@ class OverlayService : Service() {
 
     private fun updateClock(force: Boolean) {
         val time = ClockState.formattedTime(this)
-        if (!OverlayState.notificationOnly(this)) windowController.renderClock(time)
+        if (OverlayState.presentation(this) == OverlayPresentation.SYSTEM_OVERLAY) {
+            windowController.renderClock(time)
+        }
         lastFinishedState = false
         updateNotificationIfNeeded(time, null, force)
     }
@@ -88,7 +105,7 @@ class OverlayService : Service() {
     private fun updateCountdown(force: Boolean) {
         val snapshot = CountdownState.snapshot(this)
         val time = formatDuration(snapshot.remainingMillis)
-        if (!OverlayState.notificationOnly(this)) {
+        if (OverlayState.presentation(this) == OverlayPresentation.SYSTEM_OVERLAY) {
             windowController.renderCountdown(time, snapshot.isFinished)
         }
         if (snapshot.isFinished && !lastFinishedState) {
@@ -103,7 +120,7 @@ class OverlayService : Service() {
         countdown: CountdownSnapshot?,
         force: Boolean
     ) {
-        val content = if (OverlayState.notificationOnly(this)) {
+        val content = if (OverlayState.presentation(this) == OverlayPresentation.NOTIFICATION) {
             liveContent
         } else {
             when (OverlayState.mode(this)) {
@@ -120,7 +137,9 @@ class OverlayService : Service() {
     }
 
     private fun initialNotificationText(): String {
-        if (!OverlayState.notificationOnly(this) && Settings.canDrawOverlays(this)) {
+        if (OverlayState.presentation(this) == OverlayPresentation.SYSTEM_OVERLAY &&
+            Settings.canDrawOverlays(this)
+        ) {
             return when (OverlayState.mode(this)) {
                 OverlayMode.CLOCK -> "Janela de relógio ativa"
                 OverlayMode.COUNTDOWN -> "Janela de contagem ativa"
@@ -148,10 +167,19 @@ class OverlayService : Service() {
         }
     }
 
+    private fun scheduleNextTick() {
+        handler.removeCallbacks(ticker)
+        val now = System.currentTimeMillis()
+        val delay = (1_000L - (now % 1_000L)).coerceIn(50L, 1_000L)
+        handler.postDelayed(ticker, delay)
+    }
+
     override fun onDestroy() {
         handler.removeCallbacks(ticker)
         windowController.hide()
-        OverlayState.setEnabled(this, false)
+        if (OverlayState.presentation(this) != OverlayPresentation.ACCESSIBILITY_OVERLAY) {
+            OverlayState.setEnabled(this, false)
+        }
         super.onDestroy()
     }
 
@@ -161,6 +189,5 @@ class OverlayService : Service() {
         const val ACTION_RESUME_COUNTDOWN = "com.example.relogioflutuante.action.RESUME_COUNTDOWN"
         const val ACTION_START_COUNTDOWN = "com.example.relogioflutuante.action.START_COUNTDOWN"
         private const val NOTIFICATION_ID = 101
-        private const val TICK_MS = 1_000L
     }
 }

@@ -12,7 +12,9 @@ import com.example.relogioflutuante.state.OverlayState
 
 class OverlayWindowController(
     private val context: Context,
-    private val onClose: () -> Unit
+    private val onClose: () -> Unit,
+    private val windowType: Int = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+    private val canShow: () -> Boolean = { Settings.canDrawOverlays(context) }
 ) {
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var root: View? = null
@@ -20,17 +22,18 @@ class OverlayWindowController(
     private var statusText: TextView? = null
     private var params: WindowManager.LayoutParams? = null
     private var lastRenderedTime: String? = null
+    private var lastFinished: Boolean? = null
 
     fun ensureVisible(): Boolean {
         if (root != null) return true
-        if (!Settings.canDrawOverlays(context)) return false
+        if (!canShow()) return false
 
         val binding = OverlayViewFactory(context).create(onClose)
         val (savedX, savedY) = OverlayState.position(context)
         val layoutParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            windowType,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
@@ -57,6 +60,7 @@ class OverlayWindowController(
         timeText = binding.timeText
         statusText = binding.statusText
         lastRenderedTime = null
+        lastFinished = null
         return true
     }
 
@@ -65,7 +69,10 @@ class OverlayWindowController(
             timeText?.text = time
             lastRenderedTime = time
         }
-        statusText?.visibility = View.GONE
+        if (lastFinished != false) {
+            statusText?.visibility = View.GONE
+            lastFinished = false
+        }
     }
 
     fun renderCountdown(time: String, finished: Boolean) {
@@ -73,14 +80,17 @@ class OverlayWindowController(
             timeText?.text = time
             lastRenderedTime = time
         }
-        if (finished) {
-            statusText?.apply {
-                text = "TEMPO ESGOTADO"
-                setTextColor(Color.rgb(248, 113, 113))
-                visibility = View.VISIBLE
+        if (finished != lastFinished) {
+            if (finished) {
+                statusText?.apply {
+                    text = "TEMPO ESGOTADO"
+                    setTextColor(Color.rgb(248, 113, 113))
+                    visibility = View.VISIBLE
+                }
+            } else {
+                statusText?.visibility = View.GONE
             }
-        } else {
-            statusText?.visibility = View.GONE
+            lastFinished = finished
         }
     }
 
@@ -91,5 +101,6 @@ class OverlayWindowController(
         statusText = null
         params = null
         lastRenderedTime = null
+        lastFinished = null
     }
 }
