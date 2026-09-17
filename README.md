@@ -22,6 +22,8 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Android SDK 36.
 - JDK 17 ou superior compatível com a versão do Android Gradle Plugin utilizada.
 - AGP 9.4.0 / Gradle 9.6.0.
+- Jetpack Compose BOM 2026.06.00 (linha Compose 1.11.x, compatível com compileSdk 36).
+- AndroidX Core KTX 1.17.0 para manter compatibilidade com API 36.
 
 ## Comportamento do overlay
 
@@ -42,8 +44,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualm
 
 ### Versão atual
 
-- `versionName`: `1.0.4`
-- `versionCode`: `5`
+- `versionName`: `1.0.5`
+- `versionCode`: `6`
 - APK: `Relogio-Flutuante.apk`
 
 ## Organização do código

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.5
+
+- Corrigida incompatibilidade de AAR metadata encontrada no quarto build do GitHub Actions.
+- Compose BOM ajustado de `2026.08.00` para `2026.06.00`, evitando Compose 1.12.x que exige `compileSdk 37`.
+- `androidx.core:core-ktx` ajustado de `1.19.0` para `1.17.0`, mantendo compatibilidade com `compileSdk 36`.
+- Mantidos `compileSdk 36`, `targetSdk 36`, AGP 9.4.0, Gradle 9.6.0 e JDK 17.
+- Atualizados `github-manager.json`, README, `versionName` e `versionCode`.
+
 ## 1.0.4
 
 - Corrigido erro de compilação Kotlin em `FloatingClockApp.kt` no layout responsivo.
