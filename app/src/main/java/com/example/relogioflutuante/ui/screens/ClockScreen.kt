@@ -57,8 +57,9 @@ fun ClockScreen() {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .imePadding()
-            .padding(top = 18.dp, bottom = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(top = 12.dp, bottom = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         TimeCard(
             title = "HORÁRIO",
@@ -70,7 +71,7 @@ fun ClockScreen() {
             }
         )
 
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(14.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -94,7 +95,7 @@ fun ClockScreen() {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         InfoCard(
             "O ajuste não altera o relógio do Android. Ele muda apenas a hora exibida por este aplicativo e pelo relógio flutuante."
         )

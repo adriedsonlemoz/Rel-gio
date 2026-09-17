@@ -39,8 +39,8 @@ fun CountdownSetupCard(
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DurationField("Horas", hours, 99, Modifier.weight(1f), onHoursChange)
-                DurationField("Min", minutes, 59, Modifier.weight(1f), onMinutesChange)
-                DurationField("Seg", seconds, 59, Modifier.weight(1f), onSecondsChange)
+                DurationField("Minutos", minutes, 59, Modifier.weight(1f), onMinutesChange)
+                DurationField("Segundos", seconds, 59, Modifier.weight(1f), onSecondsChange)
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(

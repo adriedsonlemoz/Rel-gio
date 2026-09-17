@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
-import com.example.relogioflutuante.state.OverlayState
+import com.example.relogioflutuante.state.OverlayPositionState
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -28,28 +28,27 @@ class OverlayDragTouchListener(
                 touchY = event.rawY
                 return true
             }
-
             MotionEvent.ACTION_MOVE -> {
                 val dx = (event.rawX - touchX).roundToInt()
                 val dy = (event.rawY - touchY).roundToInt()
-                if (abs(dx) < dp(1) && abs(dy) < dp(1)) return true
-
-                val maxX = (context.resources.displayMetrics.widthPixels - view.width).coerceAtLeast(0)
-                val maxY = (context.resources.displayMetrics.heightPixels - view.height).coerceAtLeast(0)
+                if (abs(dx) < 1 && abs(dy) < 1) return true
+                val (maxX, maxY) = maxPosition(view)
                 params.x = (initialX + dx).coerceIn(0, maxX)
                 params.y = (initialY + dy).coerceIn(0, maxY)
                 windowManager.updateViewLayout(view, params)
                 return true
             }
-
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                OverlayState.savePosition(context, params.x, params.y)
+                OverlayPositionState.savePosition(context, params.x, params.y)
                 return true
             }
         }
         return false
     }
 
-    private fun dp(value: Int): Int =
-        (value * context.resources.displayMetrics.density).roundToInt()
+    private fun maxPosition(view: View): Pair<Int, Int> {
+        val metrics = context.resources.displayMetrics
+        return (metrics.widthPixels - view.width).coerceAtLeast(0) to
+            (metrics.heightPixels - view.height).coerceAtLeast(0)
+    }
 }

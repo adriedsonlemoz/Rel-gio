@@ -32,12 +32,12 @@ fun TimeCard(title: String, time: String, subtitle: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceStrong),
-        shape = RoundedCornerShape(22.dp)
+        shape = RoundedCornerShape(18.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
+                .padding(horizontal = 16.dp, vertical = 19.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -47,7 +47,7 @@ fun TimeCard(title: String, time: String, subtitle: String) {
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.4.sp
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = time,
                 color = AppColors.TextPrimary,

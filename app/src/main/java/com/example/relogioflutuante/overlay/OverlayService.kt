@@ -11,9 +11,11 @@ import android.provider.Settings
 import com.example.relogioflutuante.state.ClockState
 import com.example.relogioflutuante.state.CountdownSnapshot
 import com.example.relogioflutuante.state.CountdownState
+import com.example.relogioflutuante.state.OverlayAppearanceState
 import com.example.relogioflutuante.state.OverlayMode
 import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
+import com.example.relogioflutuante.state.CountdownMath
 import com.example.relogioflutuante.state.formatDuration
 
 class OverlayService : Service() {
@@ -97,25 +99,35 @@ class OverlayService : Service() {
     }
 
     private fun updateClock(force: Boolean) {
-        val time = ClockState.formattedTime(this)
+        val liveTime = ClockState.formattedTime(this)
         if (OverlayState.presentation(this) == OverlayPresentation.SYSTEM_OVERLAY) {
-            windowController.renderClock(time)
+            val appearance = OverlayAppearanceState.read(this)
+            val overlayTime = OverlayTextFormatter.clock(
+                ClockState.displayedLocalTime(this),
+                appearance.timeFormat
+            )
+            windowController.renderClock(overlayTime)
         }
         lastFinishedState = false
-        updateNotificationIfNeeded(time, null, force)
+        updateNotificationIfNeeded(liveTime, null, force)
     }
 
     private fun updateCountdown(force: Boolean) {
         val snapshot = CountdownState.snapshot(this)
-        val time = formatDuration(snapshot.remainingMillis)
+        val liveTime = formatDuration(snapshot.remainingMillis)
         if (OverlayState.presentation(this) == OverlayPresentation.SYSTEM_OVERLAY) {
-            windowController.renderCountdown(time, snapshot.isFinished)
+            val appearance = OverlayAppearanceState.read(this)
+            val overlayTime = OverlayTextFormatter.countdown(
+                snapshot.remainingMillis,
+                appearance.timeFormat
+            )
+            windowController.renderCountdown(overlayTime, snapshot.isFinished)
         }
         if (snapshot.isFinished && !lastFinishedState) {
             notifications.notifyTimeFinished(NOTIFICATION_ID)
         }
         lastFinishedState = snapshot.isFinished
-        updateNotificationIfNeeded(time, snapshot, force)
+        updateNotificationIfNeeded(liveTime, snapshot, force)
     }
 
     private fun updateNotificationIfNeeded(
@@ -172,9 +184,7 @@ class OverlayService : Service() {
 
     private fun scheduleNextTick() {
         handler.removeCallbacks(ticker)
-        val now = System.currentTimeMillis()
-        val delay = (1_000L - (now % 1_000L)).coerceIn(50L, 1_000L)
-        handler.postDelayed(ticker, delay)
+        handler.postDelayed(ticker, CountdownMath.delayUntilNextSecond(System.currentTimeMillis()))
     }
 
     override fun onDestroy() {

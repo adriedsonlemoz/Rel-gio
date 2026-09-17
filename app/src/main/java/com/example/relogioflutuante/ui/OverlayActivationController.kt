@@ -3,14 +3,12 @@ package com.example.relogioflutuante.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -18,28 +16,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.example.relogioflutuante.overlay.OverlayCapabilityDetector
 import com.example.relogioflutuante.overlay.OverlayService
+import com.example.relogioflutuante.overlay.OverlayStrategyResolver
 import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
 
 data class OverlayActivationController(
     val permissionRefresh: Int,
+    val enableRecommendedOverlay: () -> Unit,
     val enableSystemOverlay: () -> Unit,
     val enableAccessibilityOverlay: () -> Unit,
-    val enableNotificationMode: () -> Unit
+    val enableNotificationMode: () -> Unit,
+    val openAppDetails: () -> Unit,
+    val openAccessibilitySettings: () -> Unit,
+    val openSystemOverlaySettings: () -> Unit,
+    val requestNotificationPermission: () -> Unit
 )
 
 @Composable
-fun rememberOverlayActivationController(): OverlayActivationController {
+fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivationController {
     val context = LocalContext.current
-    var pendingSystemOverlayEnable by remember { mutableStateOf(false) }
-    var pendingAccessibilityEnable by remember { mutableStateOf(false) }
-    var pendingForegroundPresentation by remember {
-        mutableStateOf(OverlayPresentation.SYSTEM_OVERLAY)
-    }
-    var permissionRefresh by remember { mutableIntStateOf(0) }
+    val navigator = remember(context) { SettingsNavigator(context) }
+    var pendingActivation by remember { mutableStateOf<OverlayPresentation?>(null) }
 
     fun startForegroundPresentation(presentation: OverlayPresentation) {
         OverlayState.setPresentation(context, presentation)
+        OverlayState.setEnabled(context, true)
         ContextCompat.startForegroundService(context, Intent(context, OverlayService::class.java))
     }
 
@@ -47,93 +48,95 @@ fun rememberOverlayActivationController(): OverlayActivationController {
         OverlayState.setPresentation(context, OverlayPresentation.ACCESSIBILITY_OVERLAY)
         OverlayState.setEnabled(context, true)
         context.stopService(Intent(context, OverlayService::class.java))
-        permissionRefresh++
     }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        permissionRefresh++
-        if (granted || pendingForegroundPresentation == OverlayPresentation.SYSTEM_OVERLAY) {
-            startForegroundPresentation(pendingForegroundPresentation)
-        }
+        if (granted) startForegroundPresentation(OverlayPresentation.NOTIFICATION)
     }
 
-    fun requestNotificationAndStart(presentation: OverlayPresentation) {
-        pendingForegroundPresentation = presentation
+    fun requestNotifications() {
         val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
-
         if (needsPermission) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    fun enableSystemOverlay() {
+        if (OverlayCapabilityDetector.read(context).canDrawOverlays) {
+            pendingActivation = null
+            startForegroundPresentation(OverlayPresentation.SYSTEM_OVERLAY)
         } else {
-            startForegroundPresentation(presentation)
+            pendingActivation = OverlayPresentation.SYSTEM_OVERLAY
+            navigator.openOverlayPermission()
         }
     }
 
-    val accessibilitySettingsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        permissionRefresh++
-        if (pendingAccessibilityEnable) {
-            pendingAccessibilityEnable = false
-            if (OverlayCapabilityDetector.isAccessibilityServiceEnabled(context)) {
-                activateAccessibilityOverlay()
-            }
-        }
-    }
-
-    fun requestEnableAccessibilityOverlay() {
+    fun enableAccessibilityOverlay() {
         if (OverlayCapabilityDetector.isAccessibilityServiceEnabled(context)) {
+            pendingActivation = null
             activateAccessibilityOverlay()
         } else {
-            pendingAccessibilityEnable = true
-            accessibilitySettingsLauncher.launch(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            pendingActivation = OverlayPresentation.ACCESSIBILITY_OVERLAY
+            navigator.openAccessibility()
         }
     }
 
-    val systemOverlayPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        permissionRefresh++
-        if (pendingSystemOverlayEnable) {
-            pendingSystemOverlayEnable = false
-            val capability = OverlayCapabilityDetector.read(context)
-            if (capability.canDrawOverlays) {
-                requestNotificationAndStart(OverlayPresentation.SYSTEM_OVERLAY)
-            } else if (capability.isLowRamDevice) {
-                requestEnableAccessibilityOverlay()
+    fun enableNotificationMode() {
+        val notificationsGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        if (notificationsGranted) {
+            startForegroundPresentation(OverlayPresentation.NOTIFICATION)
+        } else {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+
+    LaunchedEffect(permissionRefresh, pendingActivation) {
+        when (pendingActivation) {
+            OverlayPresentation.SYSTEM_OVERLAY -> {
+                if (OverlayCapabilityDetector.read(context).canDrawOverlays) {
+                    pendingActivation = null
+                    startForegroundPresentation(OverlayPresentation.SYSTEM_OVERLAY)
+                }
             }
+            OverlayPresentation.ACCESSIBILITY_OVERLAY -> {
+                if (OverlayCapabilityDetector.isAccessibilityServiceEnabled(context)) {
+                    pendingActivation = null
+                    activateAccessibilityOverlay()
+                }
+            }
+            else -> Unit
         }
     }
 
-    fun requestEnableSystemOverlay() {
+    fun enableRecommended() {
         val capability = OverlayCapabilityDetector.read(context)
-        when {
-            capability.canDrawOverlays ->
-                requestNotificationAndStart(OverlayPresentation.SYSTEM_OVERLAY)
-            capability.isLowRamDevice -> requestEnableAccessibilityOverlay()
-            else -> {
-                pendingSystemOverlayEnable = true
-                systemOverlayPermissionLauncher.launch(
-                    Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:${context.packageName}")
-                    )
-                )
-            }
+        when (OverlayStrategyResolver.recommended(capability)) {
+            OverlayPresentation.SYSTEM_OVERLAY -> enableSystemOverlay()
+            OverlayPresentation.ACCESSIBILITY_OVERLAY -> enableAccessibilityOverlay()
+            OverlayPresentation.NOTIFICATION -> enableNotificationMode()
         }
     }
 
     return OverlayActivationController(
         permissionRefresh = permissionRefresh,
-        enableSystemOverlay = ::requestEnableSystemOverlay,
-        enableAccessibilityOverlay = ::requestEnableAccessibilityOverlay,
-        enableNotificationMode = {
-            requestNotificationAndStart(OverlayPresentation.NOTIFICATION)
-        }
+        enableRecommendedOverlay = ::enableRecommended,
+        enableSystemOverlay = ::enableSystemOverlay,
+        enableAccessibilityOverlay = ::enableAccessibilityOverlay,
+        enableNotificationMode = ::enableNotificationMode,
+        openAppDetails = navigator::openAppDetails,
+        openAccessibilitySettings = navigator::openAccessibility,
+        openSystemOverlaySettings = navigator::openOverlayPermission,
+        requestNotificationPermission = ::requestNotifications
     )
 }

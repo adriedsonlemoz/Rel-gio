@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.0 - 2026-09-17
+
+- Adicionada configuração inicial guiada para APK instalado fora da Play Store.
+- Adicionado atalho direto para Informações do app, Acessibilidade e Sobrepor a outros apps.
+- Permissões são reavaliadas automaticamente ao retornar das Configurações do Android.
+- Ativação iniciada pelo app agora continua automaticamente quando a permissão correspondente é concedida.
+- Tela Sobrepor reorganizada para destacar um único estado principal e mover métodos alternativos para “Outros métodos”.
+- Adicionados formatos `HH:MM:SS`, `MM:SS` e `:SS` para a janela flutuante.
+- Adicionados tamanho, opacidade e bloqueio de posição do overlay.
+- Quando bloqueado, o overlay deixa de capturar toques e esconde controles de mover/fechar.
+- Posição do overlay agora é salva separadamente para retrato e paisagem e limitada à área visível.
+- Visual da janela flutuante ficou mais compacto, com números monoespaçados, grip discreto e borda reduzida.
+- Navegação inferior recebeu ícones vetoriais consistentes e indicador alinhado à cor principal do app.
+- Adicionado menu com “Permissões e configuração” e “Sobre”, incluindo versão instalada.
+- Tela de Relógio recebeu melhor distribuição vertical e contraste de textos secundários.
+- Tela de Contagem esconde os campos durante execução/pausa e separa as ações em componente próprio.
+- Adicionados testes unitários para relógio, contagem, formatação e estratégia de overlay.
+- Serviço de Acessibilidade deixa de atualizar a cada segundo quando o overlay está desativado, reduzindo trabalho em aparelhos low-RAM.
+- GitHub Actions agora executa testes antes do APK e bloqueia arquivos Kotlin acima de 250 linhas.
+- Versão atualizada para `1.1.0` (`versionCode 11`).
+
 ## 1.0.9
 
 - Confirmado pelo GitHub Actions que o APK compila com sucesso (`BUILD SUCCESSFUL`).

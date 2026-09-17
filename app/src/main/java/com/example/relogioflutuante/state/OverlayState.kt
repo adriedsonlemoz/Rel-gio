@@ -2,19 +2,9 @@ package com.example.relogioflutuante.state
 
 import android.content.Context
 
-enum class OverlayMode { CLOCK, COUNTDOWN }
-
-enum class OverlayPresentation {
-    SYSTEM_OVERLAY,
-    ACCESSIBILITY_OVERLAY,
-    NOTIFICATION
-}
-
 object OverlayState {
     private const val KEY_ENABLED = "overlay_enabled"
     private const val KEY_MODE = "overlay_mode"
-    private const val KEY_X = "overlay_x"
-    private const val KEY_Y = "overlay_y"
     private const val KEY_PRESENTATION = "overlay_presentation"
     private const val LEGACY_KEY_NOTIFICATION_ONLY = "overlay_notification_only"
 
@@ -62,11 +52,4 @@ object OverlayState {
     fun notificationOnly(context: Context): Boolean =
         presentation(context) == OverlayPresentation.NOTIFICATION
 
-    fun position(context: Context): Pair<Int, Int> =
-        context.appPreferences().getInt(KEY_X, 24) to
-            context.appPreferences().getInt(KEY_Y, 120)
-
-    fun savePosition(context: Context, x: Int, y: Int) {
-        context.appPreferences().edit().putInt(KEY_X, x).putInt(KEY_Y, y).apply()
-    }
 }

@@ -54,9 +54,7 @@ fun CountdownScreen() {
             value = current
             val delayMs = if (current.isRunning) {
                 (current.remainingMillis % 1_000L).coerceIn(100L, 1_000L)
-            } else {
-                1_000L
-            }
+            } else 1_000L
             delay(delayMs)
         }
     }
@@ -65,12 +63,17 @@ fun CountdownScreen() {
         if (snapshot.isFinished) showFinishedDialog = true
     }
 
+    val isPaused = !snapshot.isRunning &&
+        snapshot.remainingMillis > 0L &&
+        snapshot.remainingMillis < snapshot.configuredMillis
+    val showSetup = !snapshot.isRunning && !isPaused
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .imePadding()
-            .padding(top = 18.dp, bottom = 24.dp),
+            .padding(top = 12.dp, bottom = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TimeCard(
@@ -79,90 +82,104 @@ fun CountdownScreen() {
             subtitle = when {
                 snapshot.isFinished -> "Tempo esgotado"
                 snapshot.isRunning -> "Em andamento"
-                snapshot.remainingMillis == 0L && snapshot.configuredMillis > 0L -> "Pronta para iniciar"
-                snapshot.configuredMillis > 0L && snapshot.remainingMillis < snapshot.configuredMillis -> "Pausada"
+                isPaused -> "Pausada"
+                snapshot.configuredMillis > 0L -> "Pronta para iniciar"
                 else -> "Defina o tempo abaixo"
             }
         )
 
-        Spacer(Modifier.height(18.dp))
-        CountdownSetupCard(
-            hours = hours,
-            minutes = minutes,
-            seconds = seconds,
-            enabled = !snapshot.isRunning,
-            onHoursChange = { hours = it },
-            onMinutesChange = { minutes = it },
-            onSecondsChange = { seconds = it },
-            onApply = {
-                CountdownState.setDuration(
-                    context,
-                    hours.toIntOrNull() ?: 0,
-                    minutes.toIntOrNull() ?: 0,
-                    seconds.toIntOrNull() ?: 0
-                )
+        if (showSetup) {
+            Spacer(Modifier.height(14.dp))
+            CountdownSetupCard(
+                hours = hours,
+                minutes = minutes,
+                seconds = seconds,
+                enabled = true,
+                onHoursChange = { hours = it },
+                onMinutesChange = { minutes = it },
+                onSecondsChange = { seconds = it },
+                onApply = {
+                    CountdownState.setDuration(
+                        context,
+                        hours.toIntOrNull() ?: 0,
+                        minutes.toIntOrNull() ?: 0,
+                        seconds.toIntOrNull() ?: 0
+                    )
+                    refreshKey++
+                }
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
+        CountdownActions(
+            isRunning = snapshot.isRunning,
+            isPaused = isPaused,
+            canStart = snapshot.configuredMillis > 0L,
+            onPause = {
+                CountdownState.pause(context)
+                refreshKey++
+            },
+            onResume = {
+                CountdownState.resume(context)
+                refreshKey++
+            },
+            onStart = {
+                CountdownState.start(context)
+                refreshKey++
+            },
+            onReset = {
+                CountdownState.reset(context)
                 refreshKey++
             }
         )
-
-        Spacer(Modifier.height(14.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            when {
-                snapshot.isRunning -> Button(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        CountdownState.pause(context)
-                        refreshKey++
-                    }
-                ) { Text("Pausar") }
-
-                snapshot.remainingMillis > 0L && snapshot.remainingMillis < snapshot.configuredMillis -> Button(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        CountdownState.resume(context)
-                        refreshKey++
-                    }
-                ) { Text("Continuar") }
-
-                else -> Button(
-                    modifier = Modifier.weight(1f),
-                    enabled = snapshot.configuredMillis > 0L,
-                    onClick = {
-                        CountdownState.start(context)
-                        refreshKey++
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
-                ) { Text("Iniciar") }
-            }
-
-            OutlinedButton(
-                modifier = Modifier.weight(1f),
-                enabled = snapshot.configuredMillis > 0L,
-                onClick = {
-                    CountdownState.reset(context)
-                    refreshKey++
-                }
-            ) { Text("Zerar") }
-        }
     }
 
     if (showFinishedDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showFinishedDialog = false
-                CountdownState.acknowledgeFinished(context)
-            },
-            title = { Text("Tempo esgotado") },
-            text = { Text("A contagem regressiva chegou a 00:00:00.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showFinishedDialog = false
-                    CountdownState.acknowledgeFinished(context)
-                }) { Text("OK") }
-            }
-        )
+        FinishedCountdownDialog {
+            showFinishedDialog = false
+            CountdownState.acknowledgeFinished(context)
+        }
     }
+}
+
+@Composable
+private fun CountdownActions(
+    isRunning: Boolean,
+    isPaused: Boolean,
+    canStart: Boolean,
+    onPause: () -> Unit,
+    onResume: () -> Unit,
+    onStart: () -> Unit,
+    onReset: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        when {
+            isRunning -> Button(Modifier.weight(1f), onClick = onPause) { Text("Pausar") }
+            isPaused -> Button(Modifier.weight(1f), onClick = onResume) { Text("Continuar") }
+            else -> Button(
+                modifier = Modifier.weight(1f),
+                enabled = canStart,
+                onClick = onStart,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
+            ) { Text("Iniciar") }
+        }
+        OutlinedButton(
+            modifier = Modifier.weight(1f),
+            enabled = canStart,
+            onClick = onReset
+        ) { Text("Zerar") }
+    }
+}
+
+@Composable
+private fun FinishedCountdownDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Tempo esgotado") },
+        text = { Text("A contagem regressiva chegou a 00:00:00.") },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("OK") } }
+    )
 }

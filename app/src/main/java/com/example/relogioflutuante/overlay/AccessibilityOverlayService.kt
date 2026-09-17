@@ -1,25 +1,34 @@
 package com.example.relogioflutuante.overlay
 
 import android.accessibilityservice.AccessibilityService
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import com.example.relogioflutuante.state.ClockState
+import com.example.relogioflutuante.state.CountdownMath
 import com.example.relogioflutuante.state.CountdownState
+import com.example.relogioflutuante.state.OverlayAppearanceState
 import com.example.relogioflutuante.state.OverlayMode
 import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
-import com.example.relogioflutuante.state.formatDuration
+import com.example.relogioflutuante.state.appPreferences
 
 class AccessibilityOverlayService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var windowController: OverlayWindowController
+    private lateinit var preferences: SharedPreferences
+
+    private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+        handler.removeCallbacks(ticker)
+        handler.post(ticker)
+    }
 
     private val ticker = object : Runnable {
         override fun run() {
-            updateOverlay()
-            scheduleNextTick()
+            val keepTicking = updateOverlay()
+            if (keepTicking) scheduleNextTick()
         }
     }
 
@@ -34,6 +43,8 @@ class AccessibilityOverlayService : AccessibilityService() {
             windowType = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             canShow = { true }
         )
+        preferences = appPreferences()
+        preferences.registerOnSharedPreferenceChangeListener(preferenceListener)
         handler.removeCallbacks(ticker)
         handler.post(ticker)
     }
@@ -44,38 +55,51 @@ class AccessibilityOverlayService : AccessibilityService() {
 
     override fun onInterrupt() = Unit
 
-    private fun updateOverlay() {
-        if (!::windowController.isInitialized) return
+    private fun updateOverlay(): Boolean {
+        if (!::windowController.isInitialized) return false
         val shouldShow = OverlayState.isEnabled(this) &&
             OverlayState.presentation(this) == OverlayPresentation.ACCESSIBILITY_OVERLAY
 
         if (!shouldShow) {
             windowController.hide()
-            return
+            return false
         }
 
-        if (!windowController.ensureVisible()) return
+        if (!windowController.ensureVisible()) return false
         when (OverlayState.mode(this)) {
-            OverlayMode.CLOCK -> windowController.renderClock(ClockState.formattedTime(this))
+            OverlayMode.CLOCK -> {
+                val appearance = OverlayAppearanceState.read(this)
+                windowController.renderClock(
+                    OverlayTextFormatter.clock(
+                        ClockState.displayedLocalTime(this),
+                        appearance.timeFormat
+                    )
+                )
+            }
             OverlayMode.COUNTDOWN -> {
                 val snapshot = CountdownState.snapshot(this)
+                val appearance = OverlayAppearanceState.read(this)
                 windowController.renderCountdown(
-                    formatDuration(snapshot.remainingMillis),
+                    OverlayTextFormatter.countdown(
+                        snapshot.remainingMillis,
+                        appearance.timeFormat
+                    ),
                     snapshot.isFinished
                 )
             }
         }
+        return true
     }
 
     private fun scheduleNextTick() {
-        val now = System.currentTimeMillis()
-        val delay = (1_000L - (now % 1_000L)).coerceIn(50L, 1_000L)
-        handler.postDelayed(ticker, delay)
+        handler.postDelayed(
+            ticker,
+            CountdownMath.delayUntilNextSecond(System.currentTimeMillis())
+        )
     }
 
     override fun onUnbind(intent: android.content.Intent?): Boolean {
-        handler.removeCallbacks(ticker)
-        if (::windowController.isInitialized) windowController.hide()
+        cleanup()
         if (OverlayState.presentation(this) == OverlayPresentation.ACCESSIBILITY_OVERLAY) {
             OverlayState.setEnabled(this, false)
         }
@@ -83,8 +107,15 @@ class AccessibilityOverlayService : AccessibilityService() {
     }
 
     override fun onDestroy() {
-        handler.removeCallbacks(ticker)
-        if (::windowController.isInitialized) windowController.hide()
+        cleanup()
         super.onDestroy()
+    }
+
+    private fun cleanup() {
+        handler.removeCallbacks(ticker)
+        if (::preferences.isInitialized) {
+            preferences.unregisterOnSharedPreferenceChangeListener(preferenceListener)
+        }
+        if (::windowController.isInitialized) windowController.hide()
     }
 }

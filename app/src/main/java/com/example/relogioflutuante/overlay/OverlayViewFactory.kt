@@ -3,7 +3,6 @@ package com.example.relogioflutuante.overlay
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
@@ -11,9 +10,11 @@ import android.widget.TextView
 import kotlin.math.roundToInt
 
 data class OverlayViewBinding(
-    val root: View,
+    val root: LinearLayout,
+    val grip: TextView,
     val timeText: TextView,
-    val statusText: TextView
+    val statusText: TextView,
+    val closeText: TextView
 )
 
 class OverlayViewFactory(private val context: Context) {
@@ -21,66 +22,50 @@ class OverlayViewFactory(private val context: Context) {
         val root = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(10), dp(6), dp(5), dp(6))
-            background = roundedBackground(Color.argb(232, 17, 24, 39), dp(15).toFloat())
-            elevation = dp(6).toFloat()
+            elevation = dp(3).toFloat()
         }
-
+        val grip = TextView(context).apply {
+            text = "⋮"
+            setTextColor(Color.rgb(148, 163, 184))
+            textSize = 17f
+            gravity = Gravity.CENTER
+            includeFontPadding = false
+            contentDescription = "Arrastar relógio flutuante"
+        }
         val textColumn = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
         }
-
         val timeText = TextView(context).apply {
             setTextColor(Color.WHITE)
-            textSize = 22f
             typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
             includeFontPadding = false
-            letterSpacing = 0.03f
+            letterSpacing = 0.02f
         }
-
         val statusText = TextView(context).apply {
             setTextColor(Color.rgb(148, 163, 184))
             textSize = 9f
             includeFontPadding = false
             visibility = View.GONE
         }
-
-        textColumn.addView(timeText)
-        textColumn.addView(statusText)
-
         val close = TextView(context).apply {
             text = "×"
             setTextColor(Color.rgb(203, 213, 225))
-            textSize = 21f
+            textSize = 19f
             gravity = Gravity.CENTER
-            setPadding(dp(7), 0, dp(3), dp(1))
+            includeFontPadding = false
             setOnClickListener { onClose() }
             contentDescription = "Fechar relógio flutuante"
         }
 
-        root.addView(
-            textColumn,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        )
-        root.addView(
-            close,
-            LinearLayout.LayoutParams(dp(36), LinearLayout.LayoutParams.MATCH_PARENT)
-        )
-
-        return OverlayViewBinding(root, timeText, statusText)
+        textColumn.addView(timeText)
+        textColumn.addView(statusText)
+        root.addView(grip)
+        root.addView(textColumn)
+        root.addView(close)
+        return OverlayViewBinding(root, grip, timeText, statusText, close)
     }
 
-    private fun roundedBackground(color: Int, radius: Float) = GradientDrawable().apply {
-        shape = GradientDrawable.RECTANGLE
-        setColor(color)
-        cornerRadius = radius
-        setStroke(dp(1), Color.argb(75, 100, 116, 139))
-    }
-
-    private fun dp(value: Int): Int =
+    fun dp(value: Int): Int =
         (value * context.resources.displayMetrics.density).roundToInt()
 }

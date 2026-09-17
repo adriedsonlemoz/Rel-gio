@@ -12,7 +12,7 @@ object AppColors {
     val Accent = Color(0xFF2563EB)
     val AccentSoft = Color(0xFF7DD3FC)
     val TextPrimary = Color(0xFFF8FAFC)
-    val TextSecondary = Color(0xFF94A3B8)
+    val TextSecondary = Color(0xFFB0BCD0)
     val Success = Color(0xFF4ADE80)
     val Warning = Color(0xFFFBBF24)
 }

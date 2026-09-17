@@ -8,12 +8,6 @@ import android.content.pm.PackageManager
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 
-data class OverlayCapability(
-    val canDrawOverlays: Boolean,
-    val isLowRamDevice: Boolean,
-    val accessibilityServiceEnabled: Boolean
-)
-
 object OverlayCapabilityDetector {
     fun read(context: Context): OverlayCapability {
         val activityManager = context.getSystemService(ActivityManager::class.java)

@@ -11,8 +11,8 @@ android {
         applicationId = "com.example.relogioflutuante"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "1.0.9"
+        versionCode = 11
+        versionName = "1.1.0"
     }
 
     buildFeatures {
@@ -44,4 +44,5 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
+    testImplementation("junit:junit:4.13.2")
 }

@@ -1,7 +1,6 @@
 package com.example.relogioflutuante.state
 
 import android.content.Context
-import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -19,7 +18,7 @@ object ClockState {
     fun setDisplayedTime(context: Context, hour: Int, minute: Int, second: Int) {
         val now = LocalTime.now()
         val target = LocalTime.of(hour, minute, second)
-        val offset = Duration.between(now, target).toMillis()
+        val offset = ClockOffsetCalculator.offsetMillis(now, target)
         context.appPreferences().edit().putLong(KEY_OFFSET_MS, offset).apply()
     }
 

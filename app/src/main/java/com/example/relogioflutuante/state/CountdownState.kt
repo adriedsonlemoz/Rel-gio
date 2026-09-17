@@ -2,7 +2,6 @@ package com.example.relogioflutuante.state
 
 import android.content.Context
 import android.os.SystemClock
-import kotlin.math.max
 
 data class CountdownSnapshot(
     val configuredMillis: Long,
@@ -78,11 +77,11 @@ object CountdownState {
         val pausedRemaining = prefs.getLong(KEY_PAUSED_REMAINING_MS, configured)
 
         if (!running) {
-            return CountdownSnapshot(configured, max(0L, pausedRemaining), false, finishedStored)
+            return CountdownSnapshot(configured, pausedRemaining.coerceAtLeast(0L), false, finishedStored)
         }
 
         val endElapsed = prefs.getLong(KEY_END_ELAPSED_MS, 0L)
-        val remaining = max(0L, endElapsed - SystemClock.elapsedRealtime())
+        val remaining = CountdownMath.remainingMillis(endElapsed, SystemClock.elapsedRealtime())
         if (remaining == 0L) {
             prefs.edit()
                 .putLong(KEY_PAUSED_REMAINING_MS, 0L)

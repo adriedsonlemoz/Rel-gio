@@ -1,76 +1,82 @@
 # Relógio Flutuante
 
-Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, contagem regressiva e janela de sobreposição sobre outros aplicativos.
+Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, contagem regressiva e janela compacta sobre outros aplicativos.
 
 ## Recursos
 
-- Relógio principal em `HH:mm:ss`.
-- Ajuste interno do horário sem modificar o relógio do Android.
-- Botão para voltar ao horário do sistema.
-- Contagem regressiva com horas, minutos e segundos.
-- Iniciar, pausar, continuar e zerar; após zerar, o tempo configurado permanece disponível para um novo início.
-- Aviso ao chegar a zero.
-- Estado persistente compartilhado entre app e overlay.
-- Overlay compacto, arrastável e com fechamento rápido.
-- Segundo método de sobreposição por Serviço de Acessibilidade usando `TYPE_ACCESSIBILITY_OVERLAY`, pensado para aparelhos que bloqueiam `SYSTEM_ALERT_WINDOW`.
-- O serviço de Acessibilidade não solicita conteúdo das janelas e não executa cliques ou gestos; ele apenas desenha o relógio/contagem.
+- Relógio principal em `HH:mm:ss` com ajuste interno independente do relógio do Android.
+- Contagem regressiva com horas, minutos e segundos; iniciar, pausar, continuar e zerar.
+- Overlay normal com `TYPE_APPLICATION_OVERLAY` quando o aparelho permite.
+- Overlay alternativo por Acessibilidade com `TYPE_ACCESSIBILITY_OVERLAY` para aparelhos que bloqueiam a permissão tradicional.
+- O serviço de Acessibilidade não lê conteúdo de janelas e não executa cliques ou gestos.
 - Modo por notificação mantido como último fallback.
-- Controles rápidos da contagem pela notificação quando esse fallback é usado.
-- Permissão `SYSTEM_ALERT_WINDOW` solicitada pela tela oficial do Android.
-- Serviço em primeiro plano do tipo `specialUse` para o overlay normal e o fallback por notificação; o modo por Acessibilidade usa o serviço do sistema correspondente.
-- Layout adaptável para celulares e telas maiores.
+- Janela com três formatos: `HH:MM:SS`, `MM:SS` e somente segundos `:SS`.
+- Três tamanhos, opacidade ajustável e posição bloqueável.
+- Ao bloquear a posição, a janela usa `FLAG_NOT_TOUCHABLE`, deixando os toques passarem integralmente para o jogo.
+- Posição lembrada separadamente em retrato e paisagem.
+- Menu principal com `Permissões e configuração` e `Sobre`.
+- Tela de configuração inicial para orientar permissões e restrições de APK instalado fora da Play Store.
+- Reavaliação automática de permissões ao voltar das Configurações do Android.
 
-## Requisitos de build
+## Primeiro uso e permissões
 
-- Android Studio compatível com API 36.
-- Android SDK 36.
-- JDK 17 ou superior compatível com a versão do Android Gradle Plugin utilizada.
-- AGP 9.4.0 / Gradle 9.6.0.
-- Jetpack Compose BOM 2026.06.00 (linha Compose 1.11.x, compatível com compileSdk 36).
-- AndroidX Core KTX 1.17.0 para manter compatibilidade com API 36.
+Em APKs instalados fora da Play Store, algumas versões do Android exigem liberar manualmente **Permitir configurações restritas** antes de ativar um serviço de Acessibilidade. O app orienta esse processo e abre diretamente `Informações do app`; o usuário ainda precisa tocar no menu de três pontos e confirmar a opção, pois o Android não fornece API pública para concedê-la automaticamente.
 
-## Comportamento do overlay
+Depois, o app pode abrir diretamente a tela de Acessibilidade. Se a ativação tiver sido iniciada pelo botão principal do overlay, o app verifica o novo estado ao voltar e ativa a janela automaticamente quando possível.
 
-Quando o aparelho permite sobreposição, a janela usa `TYPE_APPLICATION_OVERLAY`. Os toques fora dela continuam chegando ao aplicativo que estiver embaixo. A própria janela recebe toques apenas para arrastar e fechar.
+A tela de sobreposição normal também pode ser aberta pelo app. Em alguns Androids, o sistema pode exibir a lista geral de aplicativos em vez da página específica.
 
-Em aparelhos low-RAM/Android Go que bloqueiam `SYSTEM_ALERT_WINDOW`, o app oferece a sobreposição por Acessibilidade. Depois de o usuário ativar o serviço nas configurações do Android, a janela usa `TYPE_ACCESSIBILITY_OVERLAY`, sem precisar da permissão tradicional de “Sobrepor a outros apps”. O serviço está configurado com `canRetrieveWindowContent=false`, ignora eventos de acessibilidade e não implementa gestos ou cliques.
+## Overlay para jogo
 
-O modo por notificação continua disponível apenas como fallback. No Android 13+, `POST_NOTIFICATIONS` pode ser necessário para esse modo.
+O mostrador usa fonte monoespaçada para evitar deslocamento dos números a cada segundo. O usuário pode escolher:
+
+- `HH:MM:SS` — horário completo;
+- `MM:SS` — minutos e segundos;
+- `:SS` — somente os segundos, ideal para acompanhar janelas curtas dentro do jogo.
+
+Quando a posição está desbloqueada, a janela pode ser arrastada e fechada. Depois de posicioná-la, `Bloquear posição` remove os controles e torna a janela não tocável, evitando interferência no jogo.
 
 ## Desempenho
 
-Os atualizadores trabalham no máximo uma vez por segundo. Os serviços de sobreposição agora realinham a próxima atualização à virada do segundo do relógio do sistema, reduzindo deriva visual. O serviço também evita redesenhar texto e notificação quando o conteúdo exibido não mudou.
+Relógio, contagem e overlays atualizam apenas na virada do segundo. O serviço evita redesenhar conteúdo que não mudou. A aparência do overlay é aplicada somente quando uma configuração é alterada. O serviço de Acessibilidade deixa de manter ticker ativo quando a janela está desativada e acorda por mudanças nas preferências.
 
-## Observação
+## Testes
 
-Nenhuma imagem, mockup ou recurso gráfico externo foi criado ou incluído neste projeto.
+O projeto inclui testes unitários para:
 
+- cálculo da contagem regressiva;
+- alinhamento da atualização ao próximo segundo;
+- cálculo do deslocamento do relógio;
+- formatação da duração;
+- formatos do overlay;
+- escolha do método preferencial de sobreposição.
 
-## GitHub Actions e GitHub Manager
-
-O projeto inclui `github-manager.json` com nome, versão, `versionName`, `versionCode`, `applicationId`, `namespace`, linguagem, tipo e fonte da versão. A fonte principal da versão é `app/build.gradle.kts`.
-
-O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualmente ou em pushes para `main`/`master`. Ele valida a versão, instala o SDK necessário, compila o app e publica diretamente `Relogio-Flutuante.apk` em uma GitHub Release. Não publica AAB nem ZIP de artifact.
-
-### Versão atual
-
-- `versionName`: `1.0.9`
-- `versionCode`: `9`
-- APK: `Relogio-Flutuante.apk`
+O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow também impede arquivos Kotlin com mais de **250 linhas**, ajudando a evitar componentes e classes monolíticas.
 
 ## Organização do código
 
-O projeto foi fatorado desde a base para evitar arquivos monolíticos conforme novas funções forem adicionadas:
+- `ui/screens/`: Relógio, Contagem, Sobreposição e Configuração inicial.
+- `ui/components/`: componentes pequenos e reutilizáveis.
+- `ui/dialogs/`: diálogo Sobre.
+- `ui/theme/`: tema e paleta.
+- `state/`: estados persistentes, aparência, posição e cálculos.
+- `overlay/`: serviços, janela, estilo, arraste, formatação e notificações.
+- `app/src/test/`: testes unitários.
+- `MainActivity.kt`: ponto de entrada e atualização de estado ao retornar das Configurações.
 
-- `ui/screens/`: telas de Relógio, Contagem e Sobreposição.
-- `ui/components/`: componentes reutilizáveis, cartões, campos, controles de overlay e diálogos.
-- `ui/theme/`: tema e paleta visual.
-- `state/`: estado persistente do relógio, contagem e overlay.
-- `overlay/`: serviços de overlay normal e por Acessibilidade, detecção de compatibilidade, controle da janela, arraste e notificações.
-- `MainActivity.kt`: apenas ponto de entrada do aplicativo.
+## Build
 
-A recomendação para novas funções é manter cada responsabilidade no pacote correspondente e evitar concentrar lógica de estado diretamente nas telas.
+- Android SDK 36.
+- JDK 17.
+- AGP 9.4.0.
+- Gradle 9.6.0.
+- Jetpack Compose BOM 2026.06.00.
+- AndroidX Core KTX 1.17.0.
 
-## GitHub Actions
+O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida metadados e organização do código, compila o APK e publica `Relogio-Flutuante.apk` diretamente em uma GitHub Release.
 
-O workflow usa `android-actions/setup-android@v4` com a instalação automática de pacotes desativada no próprio action (`packages: ""`). Os pacotes necessários são instalados explicitamente pelo `sdkmanager`, evitando a tentativa de instalar o pacote Android legado `tools`.
+### Versão atual
+
+- `versionName`: `1.1.0`
+- `versionCode`: `11`
+- APK: `Relogio-Flutuante.apk`
