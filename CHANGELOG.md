@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1 - 2026-09-17
+
+- Corrigido erro de compilação Kotlin em `CountdownScreen.kt` detectado antes da execução dos testes unitários.
+- As ações `Pausar` e `Continuar` agora passam `modifier` e `onClick` explicitamente para `Button`, evitando conflito com a ordem dos parâmetros da API Compose.
+- Revisado o projeto inteiro para ocorrências do mesmo padrão posicional; não foram encontradas outras chamadas incorretas.
+- Mantidos os testes unitários e a validação de arquivos Kotlin abaixo de 250 linhas no GitHub Actions.
+- Versão atualizada para `1.1.1` (`versionCode 12`).
+
 ## 1.1.0 - 2026-09-17
 
 - Adicionada configuração inicial guiada para APK instalado fora da Play Store.

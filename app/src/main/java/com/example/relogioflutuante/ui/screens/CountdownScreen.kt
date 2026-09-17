@@ -157,8 +157,8 @@ private fun CountdownActions(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         when {
-            isRunning -> Button(Modifier.weight(1f), onClick = onPause) { Text("Pausar") }
-            isPaused -> Button(Modifier.weight(1f), onClick = onResume) { Text("Continuar") }
+            isRunning -> Button(modifier = Modifier.weight(1f), onClick = onPause) { Text("Pausar") }
+            isPaused -> Button(modifier = Modifier.weight(1f), onClick = onResume) { Text("Continuar") }
             else -> Button(
                 modifier = Modifier.weight(1f),
                 enabled = canStart,
