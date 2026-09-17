@@ -54,7 +54,7 @@ O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualm
 
 ### Versão atual
 
-- `versionName`: `1.0.8`
+- `versionName`: `1.0.9`
 - `versionCode`: `9`
 - APK: `Relogio-Flutuante.apk`
 

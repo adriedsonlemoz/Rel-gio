@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.9
+
+- Confirmado pelo GitHub Actions que o APK compila com sucesso (`BUILD SUCCESSFUL`).
+- Corrigida a etapa de publicação que falhava depois do build com `Error creating asset temp dir`.
+- Removido `softprops/action-gh-release@v2` da publicação do APK; a Release agora usa o GitHub CLI (`gh release`).
+- A publicação agora suporta reexecução do mesmo workflow: se a Release já existir, o APK é reenviado com `--clobber`.
+- Atualizadas as actions para runtimes Node 24 (`actions/checkout@v6`, `actions/setup-java@v6` e `gradle/actions/setup-gradle@v6`).
+- Mantida a saída direta `Relogio-Flutuante.apk` na GitHub Release, sem AAB e sem ZIP de artifact.
+- Atualizados README, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.8
 
 - Corrigido erro de compilação Kotlin no `OverlayService.kt` após a introdução do `OverlayWindowController` configurável.

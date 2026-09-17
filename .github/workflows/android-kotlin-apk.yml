@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -40,7 +40,7 @@ jobs:
           sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
 
       - name: Setup Gradle 9.6.0
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: "9.6.0"
 
@@ -69,6 +69,7 @@ jobs:
         run: |
           mkdir -p release
           cp app/build/outputs/apk/debug/app-debug.apk release/Relogio-Flutuante.apk
+          test -s release/Relogio-Flutuante.apk
 
       - name: Read version
         id: version
@@ -78,10 +79,24 @@ jobs:
           echo "name=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Publish APK to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.name }}-${{ github.run_number }}
-          name: Relógio Flutuante v${{ steps.version.outputs.name }}
-          files: release/Relogio-Flutuante.apk
-          fail_on_unmatched_files: true
-          make_latest: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.name }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          TAG="v${VERSION}-${RUN_NUMBER}"
+          TITLE="Relógio Flutuante v${VERSION}"
+          APK="release/Relogio-Flutuante.apk"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG já existe; atualizando APK."
+            gh release upload "$TAG" "$APK" --clobber
+            gh release edit "$TAG" --title "$TITLE" --latest
+          else
+            echo "Criando release $TAG."
+            gh release create "$TAG" "$APK" \
+              --title "$TITLE" \
+              --notes "APK Android do Relógio Flutuante v${VERSION}." \
+              --latest
+          fi
