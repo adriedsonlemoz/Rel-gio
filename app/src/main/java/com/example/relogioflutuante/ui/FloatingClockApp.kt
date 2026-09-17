@@ -157,7 +157,8 @@ private fun AppHeader() {
 @Composable
 private fun ResponsiveContent(content: @Composable () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        val horizontal = if (maxWidth >= 700.dp) 48.dp else 18.dp
+        val isWideLayout = maxWidth >= 700.dp
+        val horizontal = if (isWideLayout) 48.dp else 18.dp
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -165,7 +166,7 @@ private fun ResponsiveContent(content: @Composable () -> Unit) {
             contentAlignment = Alignment.TopCenter
         ) {
             Box(
-                modifier = if (maxWidth >= 700.dp) Modifier.width(680.dp) else Modifier.fillMaxWidth()
+                modifier = if (isWideLayout) Modifier.width(680.dp) else Modifier.fillMaxWidth()
             ) {
                 content()
             }

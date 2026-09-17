@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.4
+
+- Corrigido erro de compilação Kotlin em `FloatingClockApp.kt` no layout responsivo.
+- O valor de largura do `BoxWithConstraints` agora é capturado antes do `Box` interno, evitando uso inválido do receiver implícito.
+- Confirmado pelo log que o workflow já passa pela instalação do Android SDK e chega à compilação do aplicativo.
+- Corrigida a versão exibida no README para manter documentação e metadados sincronizados.
+- Atualizados `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.3
 
 - Corrigido o build do GitHub Actions que falhava ao tentar instalar `platforms;android-37`.
