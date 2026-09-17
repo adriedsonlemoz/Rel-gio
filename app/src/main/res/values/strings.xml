@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Relógio Flutuante</string>
+    <string name="overlay_channel_name">Relógio sobre outros apps</string>
+    <string name="overlay_channel_description">Mantém o relógio ou a contagem regressiva visível sobre outros aplicativos.</string>
+</resources>
