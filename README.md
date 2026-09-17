@@ -19,7 +19,7 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 ## Requisitos de build
 
 - Android Studio compatível com API 37.
-- Android SDK 37.
+- Android SDK 36.
 - JDK 17 ou superior compatível com a versão do Android Gradle Plugin utilizada.
 - AGP 9.4.0 / Gradle 9.6.0.
 

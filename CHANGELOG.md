@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.3
+
+- Corrigido o build do GitHub Actions que falhava ao tentar instalar `platforms;android-37`.
+- Ajustados `compileSdk` e `targetSdk` para Android 16 / API 36 estável.
+- Ajustado o workflow para instalar `platforms;android-36` com Build Tools 36.0.0.
+- Mantidos AGP 9.4.0, Gradle 9.6.0 e JDK 17.
+- Atualizados `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.2
 
 - Refatorada a estrutura do projeto para evitar arquivos monolíticos.
