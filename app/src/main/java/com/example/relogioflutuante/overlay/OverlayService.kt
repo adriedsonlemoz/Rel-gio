@@ -33,10 +33,13 @@ class OverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        windowController = OverlayWindowController(this) {
-            OverlayState.setEnabled(this, false)
-            stopSelf()
-        }
+        windowController = OverlayWindowController(
+            context = this,
+            onClose = {
+                OverlayState.setEnabled(this, false)
+                stopSelf()
+            }
+        )
         notifications = OverlayNotificationManager(this).also { it.createChannel() }
     }
 

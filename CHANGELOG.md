@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.8
+
+- Corrigido erro de compilação Kotlin no `OverlayService.kt` após a introdução do `OverlayWindowController` configurável.
+- A callback de fechamento agora é passada explicitamente como `onClose`, evitando que a lambda seja interpretada como `canShow`.
+- Revisadas as chamadas do `OverlayWindowController`; o serviço de Acessibilidade já utilizava argumentos nomeados corretamente.
+- Atualizados README, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.7
 
 - Adicionada sobreposição alternativa por `AccessibilityService` com `TYPE_ACCESSIBILITY_OVERLAY`.
