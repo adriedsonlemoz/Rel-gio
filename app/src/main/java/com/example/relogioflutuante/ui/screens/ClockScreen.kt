@@ -39,13 +39,16 @@ fun ClockScreen() {
     var showAdjust by remember { mutableStateOf(false) }
     var refreshKey by remember { mutableIntStateOf(0) }
 
+    val isSystemTime = remember(refreshKey) { ClockState.offsetMillis(context) == 0L }
+
     val displayedTime by produceState(
         initialValue = ClockState.formattedTime(context),
         key1 = refreshKey
     ) {
         while (true) {
             value = ClockState.formattedTime(context)
-            delay(200L)
+            val untilNextSecond = 1_000L - (System.currentTimeMillis() % 1_000L)
+            delay(untilNextSecond.coerceAtLeast(100L))
         }
     }
 
@@ -60,7 +63,7 @@ fun ClockScreen() {
         TimeCard(
             title = "HORÁRIO",
             time = displayedTime,
-            subtitle = if (ClockState.offsetMillis(context) == 0L) {
+            subtitle = if (isSystemTime) {
                 "Sincronizado com o horário do aparelho"
             } else {
                 "Horário ajustado somente dentro deste aplicativo"

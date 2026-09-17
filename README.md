@@ -12,6 +12,8 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Aviso ao chegar a zero.
 - Estado persistente compartilhado entre app e overlay.
 - Overlay compacto, arrastável e com fechamento rápido.
+- Modo compatível para aparelhos que bloqueiam sobreposição: relógio ou contagem permanecem visíveis em notificação persistente.
+- Controles rápidos da contagem pela notificação no modo compatível.
 - Permissão `SYSTEM_ALERT_WINDOW` solicitada pela tela oficial do Android.
 - Serviço em primeiro plano do tipo `specialUse` enquanto o overlay está ativo.
 - Layout adaptável para celulares e telas maiores.
@@ -25,11 +27,17 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Jetpack Compose BOM 2026.06.00 (linha Compose 1.11.x, compatível com compileSdk 36).
 - AndroidX Core KTX 1.17.0 para manter compatibilidade com API 36.
 
-## Comportamento do overlay
+## Comportamento do overlay e modo compatível
 
-A janela usa `TYPE_APPLICATION_OVERLAY`. Os toques fora dela continuam chegando ao aplicativo que estiver embaixo. A própria janela recebe toques apenas para arrastar e fechar.
+Quando o aparelho permite sobreposição, a janela usa `TYPE_APPLICATION_OVERLAY`. Os toques fora dela continuam chegando ao aplicativo que estiver embaixo. A própria janela recebe toques apenas para arrastar e fechar.
 
-No Android 13+, a permissão de notificações também é solicitada ao ativar o overlay. A recusa não altera a permissão de sobreposição, mas pode limitar a visibilidade da notificação do serviço de acordo com o comportamento do sistema.
+Em aparelhos low-RAM/Android Go que bloqueiam `SYSTEM_ALERT_WINDOW`, o aplicativo evita abrir repetidamente a tela de permissão indisponível e oferece automaticamente o modo compatível. Nesse modo, relógio ou contagem continuam fora do app por uma notificação persistente do serviço em primeiro plano. A contagem oferece ação rápida de iniciar, pausar ou continuar.
+
+No Android 13+, a permissão de notificações é necessária para que o modo compatível apareça corretamente na área de notificações.
+
+## Desempenho
+
+Os atualizadores de relógio, contagem e serviço trabalham em cadência de 1 segundo, adequada à precisão visual `HH:mm:ss`. A versão anterior atualizava entre 5 e 10 vezes por segundo, causando recomposições, leituras de preferências e redesenhos desnecessários. O serviço também evita atualizar texto e notificação quando o conteúdo exibido não mudou.
 
 ## Observação
 
@@ -44,8 +52,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualm
 
 ### Versão atual
 
-- `versionName`: `1.0.5`
-- `versionCode`: `6`
+- `versionName`: `1.0.6`
+- `versionCode`: `7`
 - APK: `Relogio-Flutuante.apk`
 
 ## Organização do código
@@ -53,10 +61,10 @@ O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualm
 O projeto foi fatorado desde a base para evitar arquivos monolíticos conforme novas funções forem adicionadas:
 
 - `ui/screens/`: telas de Relógio, Contagem e Sobreposição.
-- `ui/components/`: componentes reutilizáveis, cartões, campos e diálogos.
+- `ui/components/`: componentes reutilizáveis, cartões, campos, controles de overlay e diálogos.
 - `ui/theme/`: tema e paleta visual.
 - `state/`: estado persistente do relógio, contagem e overlay.
-- `overlay/`: serviço, criação da janela flutuante, arraste e notificações.
+- `overlay/`: serviço, detecção de compatibilidade, controle da janela flutuante, arraste e notificações.
 - `MainActivity.kt`: apenas ponto de entrada do aplicativo.
 
 A recomendação para novas funções é manter cada responsabilidade no pacote correspondente e evitar concentrar lógica de estado diretamente nas telas.

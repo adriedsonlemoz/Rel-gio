@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.6
+
+- Adicionado modo compatível para aparelhos low-RAM/Android Go que bloqueiam a permissão de sobreposição.
+- O app evita abrir a tela de sobreposição indisponível quando detecta essa limitação e usa notificação persistente.
+- Adicionado fallback manual “Usar modo compatível” para fabricantes que bloqueiam overlay mesmo fora do modo low-RAM.
+- Relógio e contagem no modo compatível compartilham o mesmo estado do aplicativo.
+- Adicionados controles rápidos de iniciar, pausar e continuar a contagem pela notificação.
+- Reduzida a frequência do relógio de 5 atualizações/s para 1 atualização/s.
+- Reduzida a frequência da contagem de 10 atualizações/s para atualização alinhada aos segundos.
+- Reduzida a frequência do serviço de overlay de 5 atualizações/s para 1 atualização/s.
+- O serviço agora evita redesenhar texto/notificação quando o conteúdo não mudou.
+- Corrigida a exibição da contagem para arredondar o segundo restante corretamente, evitando perder um segundo logo após iniciar.
+- Simplificado o `TimeCard`, removendo `BoxWithConstraints` da área atualizada a cada segundo.
+- Navegação e cabeçalho ficaram mais compactos e leves, sem adicionar animações ou recursos gráficos externos.
+- Mantida a fatoração: controle da janela flutuante e componentes de configuração/overlay foram separados para evitar arquivos monolíticos.
+- Atualizados README, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.5
 
 - Corrigida incompatibilidade de AAR metadata encontrada no quarto build do GitHub Actions.

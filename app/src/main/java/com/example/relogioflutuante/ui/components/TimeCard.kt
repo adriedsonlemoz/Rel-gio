@@ -1,6 +1,5 @@
 package com.example.relogioflutuante.ui.components
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -22,48 +22,48 @@ import com.example.relogioflutuante.ui.theme.AppColors
 
 @Composable
 fun TimeCard(title: String, time: String, subtitle: String) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val timeSize = when {
+        screenWidth < 350 -> 38.sp
+        screenWidth < 500 -> 48.sp
+        else -> 58.sp
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceStrong),
-        shape = RoundedCornerShape(26.dp)
+        shape = RoundedCornerShape(22.dp)
     ) {
-        BoxWithConstraints(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 28.dp),
-            contentAlignment = Alignment.Center
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val timeSize = when {
-                maxWidth < 330.dp -> 38.sp
-                maxWidth < 450.dp -> 48.sp
-                else -> 58.sp
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = title,
-                    color = AppColors.AccentSoft,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.6.sp
-                )
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    text = time,
-                    color = AppColors.TextPrimary,
-                    fontSize = timeSize,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = subtitle,
-                    color = AppColors.TextSecondary,
-                    fontSize = 13.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
+            Text(
+                text = title,
+                color = AppColors.AccentSoft,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.4.sp
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = time,
+                color = AppColors.TextPrimary,
+                fontSize = timeSize,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = subtitle,
+                color = AppColors.TextSecondary,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
