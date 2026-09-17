@@ -1,0 +1,18 @@
+{
+  "name": "Relógio Flutuante",
+  "nome": "Relógio Flutuante",
+  "currentVersion": "1.0.1",
+  "versaoAtual": "1.0.1",
+  "versionName": "1.0.1",
+  "versionCode": 2,
+  "applicationId": "com.example.relogioflutuante",
+  "namespace": "com.example.relogioflutuante",
+  "language": "Kotlin",
+  "linguagem": "Kotlin",
+  "type": "Android",
+  "tipo": "Android",
+  "versionSource": "app/build.gradle.kts",
+  "fonteVersao": "app/build.gradle.kts",
+  "apkName": "Relogio-Flutuante.apk",
+  "workflow": ".github/workflows/android-kotlin-apk.yml"
+}

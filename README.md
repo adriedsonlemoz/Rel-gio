@@ -32,3 +32,16 @@ No Android 13+, a permissão de notificações também é solicitada ao ativar o
 ## Observação
 
 Nenhuma imagem, mockup ou recurso gráfico externo foi criado ou incluído neste projeto.
+
+
+## GitHub Actions e GitHub Manager
+
+O projeto inclui `github-manager.json` com nome, versão, `versionName`, `versionCode`, `applicationId`, `namespace`, linguagem, tipo e fonte da versão. A fonte principal da versão é `app/build.gradle.kts`.
+
+O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualmente ou em pushes para `main`/`master`. Ele valida a versão, instala o SDK necessário, compila o app e publica diretamente `Relogio-Flutuante.apk` em uma GitHub Release. Não publica AAB nem ZIP de artifact.
+
+### Versão atual
+
+- `versionName`: `1.0.1`
+- `versionCode`: `2`
+- APK: `Relogio-Flutuante.apk`
