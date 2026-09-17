@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.2
+
+- Refatorada a estrutura do projeto para evitar arquivos monolíticos.
+- `MainActivity.kt` reduzido para apenas o ponto de entrada do aplicativo.
+- Separadas as telas de Relógio, Contagem e Sobreposição.
+- Separados componentes visuais reutilizáveis e tema.
+- Separados os estados persistentes de relógio, contagem e overlay.
+- Separado o serviço de overlay em serviço, criação de view, arraste e notificações.
+- Atualizado o caminho do serviço no `AndroidManifest.xml`.
+- Corrigido o workflow GitHub Actions para não tentar instalar o pacote Android legado `tools`.
+- Atualizados `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.0.1
 
 - Adicionado `github-manager.json` compatível com o padrão do GitHub Manager.

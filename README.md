@@ -45,3 +45,20 @@ O workflow `.github/workflows/android-kotlin-apk.yml` pode ser executado manualm
 - `versionName`: `1.0.1`
 - `versionCode`: `2`
 - APK: `Relogio-Flutuante.apk`
+
+## Organização do código
+
+O projeto foi fatorado desde a base para evitar arquivos monolíticos conforme novas funções forem adicionadas:
+
+- `ui/screens/`: telas de Relógio, Contagem e Sobreposição.
+- `ui/components/`: componentes reutilizáveis, cartões, campos e diálogos.
+- `ui/theme/`: tema e paleta visual.
+- `state/`: estado persistente do relógio, contagem e overlay.
+- `overlay/`: serviço, criação da janela flutuante, arraste e notificações.
+- `MainActivity.kt`: apenas ponto de entrada do aplicativo.
+
+A recomendação para novas funções é manter cada responsabilidade no pacote correspondente e evitar concentrar lógica de estado diretamente nas telas.
+
+## GitHub Actions
+
+O workflow usa `android-actions/setup-android@v4` com a instalação automática de pacotes desativada no próprio action (`packages: ""`). Os pacotes necessários são instalados explicitamente pelo `sdkmanager`, evitando a tentativa de instalar o pacote Android legado `tools`.
