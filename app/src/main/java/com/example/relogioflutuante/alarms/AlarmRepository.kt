@@ -32,6 +32,28 @@ class AlarmRepository(context: Context) {
         return updated
     }
 
+    fun ensureDefaultAlarms(): List<Alarm> {
+        if (prefs.getBoolean(KEY_DEFAULTS_V1_SEEDED, false)) return emptyList()
+        val current = all().toMutableList()
+        val added = mutableListOf<Alarm>()
+        AlarmDefaults.definitions.forEach { definition ->
+            val exists = current.any {
+                it.hour == definition.hour &&
+                    it.minute == definition.minute &&
+                    it.label == definition.label &&
+                    it.zoneId == AlarmDefaults.BRASILIA_ZONE
+            }
+            if (!exists) {
+                val alarm = AlarmDefaults.create(nextId(), definition)
+                current += alarm
+                added += alarm
+            }
+        }
+        write(current)
+        prefs.edit().putBoolean(KEY_DEFAULTS_V1_SEEDED, true).apply()
+        return added
+    }
+
     private fun write(alarms: List<Alarm>) {
         prefs.edit().putString(KEY_ALARMS, AlarmCodec.encode(alarms)).apply()
     }
@@ -39,5 +61,6 @@ class AlarmRepository(context: Context) {
     private companion object {
         const val KEY_ALARMS = "alarms_items_v1"
         const val KEY_NEXT_ID = "alarms_next_id_v1"
+        const val KEY_DEFAULTS_V1_SEEDED = "alarms_defaults_zyrvorthian_v1"
     }
 }

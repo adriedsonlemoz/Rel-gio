@@ -60,6 +60,18 @@
             </intent-filter>
         </receiver>
 
+
+        <service
+            android:name=".overlay.OverlayQuickTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_nav_clock"
+            android:label="Relógio Flutuante"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <service
             android:name=".overlay.AccessibilityOverlayService"
             android:exported="true"

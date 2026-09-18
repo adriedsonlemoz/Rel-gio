@@ -47,6 +47,26 @@ class AlarmTimeRulesTest {
         )
     }
 
+
+    @Test
+    fun fixedBrasiliaZoneIgnoresDeviceZone() {
+        val deviceZone = ZoneId.of("UTC")
+        val now = ZonedDateTime.of(2026, 9, 18, 18, 0, 0, 0, deviceZone)
+            .toInstant().toEpochMilli()
+        val alarm = Alarm(
+            id = 4,
+            hour = 16,
+            minute = 55,
+            repeatDays = DayOfWeek.entries.toSet(),
+            zoneId = "America/Sao_Paulo"
+        )
+        val expected = ZonedDateTime.of(
+            2026, 9, 18, 16, 55, 0, 0, ZoneId.of("America/Sao_Paulo")
+        ).toInstant().toEpochMilli()
+
+        assertEquals(expected, AlarmTimeRules.nextTriggerMillis(alarm, now))
+    }
+
     private fun millis(
         year: Int,
         month: Int,

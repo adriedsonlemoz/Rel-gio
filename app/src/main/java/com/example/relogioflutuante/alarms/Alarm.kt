@@ -8,7 +8,8 @@ data class Alarm(
     val minute: Int,
     val label: String = "",
     val repeatDays: Set<DayOfWeek> = emptySet(),
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val zoneId: String? = null
 ) {
     init {
         require(hour in 0..23)

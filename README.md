@@ -12,10 +12,12 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Modo por notificação mantido como último fallback.
 - Janela com três formatos: `HH:MM:SS`, `MM:SS` e somente segundos `:SS`.
 - Três tamanhos, opacidade ajustável e posição bloqueável.
+- Presets rápidos de overlay: `Jogo`, `Discreto` e `Cronômetro`, aplicando formato, tamanho, opacidade e bloqueio em um toque.
 - Ao bloquear a posição, a janela usa `FLAG_NOT_TOUCHABLE`, deixando os toques passarem integralmente para o jogo.
 - Posição lembrada separadamente em retrato e paisagem.
 - Menu principal refinado em folha inferior, com acesso a `Permissões e configuração`, `Sobre` e atalho de apoio via PIX.
 - Ativação direta pela tela Relógio, sem precisar entrar primeiro na aba Sobrepor.
+- Atalho opcional no painel de Configurações Rápidas do Android para ativar/desativar o relógio flutuante sem abrir o aplicativo.
 - Guia completo de configuração disponível pelo menu para permissões e restrições de APK instalado fora da Play Store.
 - Reavaliação automática de permissões ao voltar das Configurações do Android.
 - Interface em tela inteira/imersiva, com barras do sistema ocultas e reaparecimento temporário por gesto.
@@ -45,7 +47,7 @@ Os fusos mundiais usam o instante real fornecido pelo Android. O ajuste manual d
 
 ## Alarmes
 
-A aba `Alarmes` permite criar alarmes únicos ou recorrentes por dias da semana. O nome é opcional, cada item pode ser ativado/desativado e os alarmes salvos permanecem no aparelho. Alarmes de uma única vez são desativados automaticamente depois de tocar; os recorrentes são reagendados.
+A aba `Alarmes` permite criar alarmes únicos ou recorrentes por dias da semana. O nome é opcional, cada item pode ser ativado/desativado e os alarmes salvos permanecem no aparelho. Alarmes de uma única vez são desativados automaticamente depois de tocar; os recorrentes são reagendados. A versão 1.4.0 cria uma única vez três alarmes diários predefinidos no fuso `America/Sao_Paulo`: `Zyrvorthian Corvith` às 16:55, `Zyrvorthian Ortson` às 18:55 e `Zyrvorthian Zulanka` às 19:55. Depois de criados, eles podem ser editados, desativados ou excluídos normalmente.
 
 No Android 12 ou superior, o aplicativo verifica o acesso especial **Alarmes e lembretes**. Com o acesso liberado, usa alarmes exatos para maior precisão. Sem esse acesso, mantém um agendamento compatível menos preciso, sujeito aos atrasos que o Android pode aplicar. No Android 13 ou superior, a tela também solicita a permissão de notificações quando necessária.
 
@@ -117,8 +119,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.3.2`
-- `versionCode`: `22`
+- `versionName`: `1.4.0`
+- `versionCode`: `23`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada

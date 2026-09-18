@@ -40,6 +40,15 @@ object OverlayAppearanceState {
         context.appPreferences().edit().putBoolean(KEY_LOCKED, locked).apply()
     }
 
+    fun applyPreset(context: Context, preset: OverlayPreset) {
+        context.appPreferences().edit()
+            .putString(KEY_TIME_FORMAT, preset.timeFormat.name)
+            .putString(KEY_SIZE, preset.size.name)
+            .putInt(KEY_OPACITY, preset.opacityPercent.coerceIn(40, 100))
+            .putBoolean(KEY_LOCKED, preset.positionLocked)
+            .apply()
+    }
+
     private inline fun <reified T : Enum<T>> enumValueOrDefault(
         stored: String?,
         fallback: T

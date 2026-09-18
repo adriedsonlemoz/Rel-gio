@@ -98,6 +98,11 @@ fun OverlayScreen(
                 OverlayAppearanceState.setPositionLocked(context, locked)
                 appearance = OverlayAppearanceState.read(context)
                 onMessage(if (locked) "Posição bloqueada" else "Posição desbloqueada")
+            },
+            onPresetApply = { preset ->
+                OverlayAppearanceState.applyPreset(context, preset)
+                appearance = OverlayAppearanceState.read(context)
+                onMessage("Preset ${preset.label} aplicado")
             }
         )
 

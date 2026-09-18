@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.4.0
+
+- Corrigida a falha de compilação do menu inferior causada pelo uso de `ModalBottomSheet` sem opt-in explícito da API experimental do Material 3.
+- Adicionados presets rápidos de aparência do overlay: `Jogo`, `Discreto` e `Cronômetro`.
+- Cada preset aplica em um toque formato, tamanho, opacidade e estado de bloqueio da posição.
+- Adicionado serviço de Configurações Rápidas do Android para ativar/desativar o Relógio Flutuante pelo painel rápido do sistema.
+- O atalho reutiliza o método de overlay já configurado; quando nenhuma permissão compatível está pronta, abre o aplicativo para concluir a configuração.
+- Adicionados três alarmes diários predefinidos, criados uma única vez: `Zyrvorthian Corvith` às 16:55, `Zyrvorthian Ortson` às 18:55 e `Zyrvorthian Zulanka` às 19:55.
+- Os três alarmes usam explicitamente `America/Sao_Paulo` (horário de Brasília), independentemente do fuso atual do aparelho.
+- Cards de alarmes com fuso fixo passam a indicar `Horário de Brasília`.
+- Codec de alarmes atualizado de forma retrocompatível para persistir fuso opcional sem invalidar alarmes das versões anteriores.
+- Edição de um alarme com fuso fixo preserva seu fuso.
+- Defaults também são garantidos após atualização/reinicialização e são reagendados pelo fluxo existente.
+- Atualizados testes, README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.3.2
 
 - Nova rodada de acabamento visual fino nas telas principais, sem alterar a lógica central do aplicativo.

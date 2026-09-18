@@ -25,12 +25,15 @@ object AlarmFormatting {
     fun nextTriggerSummary(
         alarm: Alarm,
         nowMillis: Long,
-        zoneId: ZoneId = ZoneId.systemDefault()
+        zoneId: ZoneId? = null
     ): String {
         if (!alarm.enabled) return "Desativado"
-        val triggerMillis = AlarmTimeRules.nextTriggerMillis(alarm, nowMillis, zoneId)
-        val now = ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(nowMillis), zoneId)
-        val trigger = ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(triggerMillis), zoneId)
+        val effectiveZone = zoneId ?: alarm.zoneId
+            ?.let { runCatching { ZoneId.of(it) }.getOrNull() }
+            ?: ZoneId.systemDefault()
+        val triggerMillis = AlarmTimeRules.nextTriggerMillis(alarm, nowMillis, effectiveZone)
+        val now = ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(nowMillis), effectiveZone)
+        val trigger = ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(triggerMillis), effectiveZone)
         val day = when (trigger.toLocalDate().toEpochDay() - now.toLocalDate().toEpochDay()) {
             0L -> "Hoje"
             1L -> "Amanhã"
@@ -62,6 +65,12 @@ object AlarmFormatting {
         DayOfWeek.FRIDAY -> "Sex"
         DayOfWeek.SATURDAY -> "Sáb"
         DayOfWeek.SUNDAY -> "Dom"
+    }
+
+    fun zoneSummary(alarm: Alarm): String? = when (alarm.zoneId) {
+        "America/Sao_Paulo" -> "Horário de Brasília"
+        null -> null
+        else -> alarm.zoneId
     }
 
     fun compactDay(day: DayOfWeek): String = when (day) {

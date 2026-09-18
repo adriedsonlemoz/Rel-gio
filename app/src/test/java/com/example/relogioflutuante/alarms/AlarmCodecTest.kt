@@ -14,12 +14,23 @@ class AlarmCodecTest {
                 minute = 45,
                 label = "Acordar: café ☕",
                 repeatDays = setOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
-                enabled = true
+                enabled = true,
+                zoneId = "America/Sao_Paulo"
             ),
             Alarm(id = 9L, hour = 20, minute = 10, enabled = false)
         )
 
         assertEquals(alarms, AlarmCodec.decode(AlarmCodec.encode(alarms)))
+    }
+
+
+    @Test
+    fun legacyAlarmWithoutZoneStillLoads() {
+        val decoded = AlarmCodec.decode("1:7:30:1:127:VGVzdGU")
+
+        assertEquals(1, decoded.size)
+        assertEquals(null, decoded.first().zoneId)
+        assertEquals("Teste", decoded.first().label)
     }
 
     @Test

@@ -172,6 +172,14 @@ private fun AlarmRow(
                 fontWeight = FontWeight.Medium,
                 maxLines = 1
             )
+            AlarmFormatting.zoneSummary(alarm)?.let { zone ->
+                Text(
+                    zone,
+                    color = AppColors.TextSecondary,
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
             if (alarm.repeatDays.isNotEmpty()) {
                 Row(
                     modifier = Modifier.padding(top = 6.dp),

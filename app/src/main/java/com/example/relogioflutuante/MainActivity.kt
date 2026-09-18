@@ -3,6 +3,8 @@ package com.example.relogioflutuante
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.example.relogioflutuante.alarms.AlarmRepository
+import com.example.relogioflutuante.alarms.AlarmScheduler
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -15,6 +17,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val addedDefaults = AlarmRepository(this).ensureDefaultAlarms()
+        val alarmScheduler = AlarmScheduler(this)
+        addedDefaults.forEach(alarmScheduler::schedule)
         applyImmersiveMode(window)
         setContent {
             FloatingClockTheme {

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.R
 import com.example.relogioflutuante.ui.theme.AppColors
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppHeader(
     onOpenSetup: () -> Unit,

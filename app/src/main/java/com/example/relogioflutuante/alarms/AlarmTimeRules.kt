@@ -9,9 +9,12 @@ object AlarmTimeRules {
     fun nextTriggerMillis(
         alarm: Alarm,
         nowMillis: Long,
-        zoneId: ZoneId = ZoneId.systemDefault()
+        zoneId: ZoneId? = null
     ): Long {
-        val now = Instant.ofEpochMilli(nowMillis).atZone(zoneId)
+        val effectiveZone = zoneId ?: alarm.zoneId
+            ?.let { runCatching { ZoneId.of(it) }.getOrNull() }
+            ?: ZoneId.systemDefault()
+        val now = Instant.ofEpochMilli(nowMillis).atZone(effectiveZone)
         val time = LocalTime.of(alarm.hour, alarm.minute)
         val candidate = if (alarm.repeatDays.isEmpty()) {
             nextOneShot(now, time)

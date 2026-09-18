@@ -149,7 +149,8 @@ private fun saveAlarm(
         minute = minute,
         label = label,
         repeatDays = days,
-        enabled = true
+        enabled = true,
+        zoneId = existing?.zoneId
     )
     repository.save(alarm)
     scheduler.schedule(alarm)

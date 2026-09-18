@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.state.OverlayAppearance
+import com.example.relogioflutuante.state.OverlayPreset
 import com.example.relogioflutuante.state.OverlaySize
 import com.example.relogioflutuante.state.OverlayTimeFormat
 import com.example.relogioflutuante.ui.theme.AppColors
@@ -36,7 +37,8 @@ fun OverlayAppearanceCard(
     onFormatChange: (OverlayTimeFormat) -> Unit,
     onSizeChange: (OverlaySize) -> Unit,
     onOpacityChange: (Int) -> Unit,
-    onLockedChange: (Boolean) -> Unit
+    onLockedChange: (Boolean) -> Unit,
+    onPresetApply: (OverlayPreset) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -59,6 +61,21 @@ fun OverlayAppearanceCard(
                         color = AppColors.AccentSoft,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
+                    )
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+            Text("Presets rápidos", color = AppColors.TextSecondary, fontSize = 12.sp)
+            Spacer(Modifier.height(6.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+                OverlayPreset.entries.forEach { preset ->
+                    PresetChip(
+                        modifier = Modifier.weight(1f),
+                        label = preset.label,
+                        onClick = { onPresetApply(preset) }
                     )
                 }
             }
@@ -122,6 +139,29 @@ fun OverlayAppearanceCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PresetChip(
+    modifier: Modifier,
+    label: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = modifier,
+        color = AppColors.SurfaceStrong,
+        shape = RoundedCornerShape(12.dp),
+        onClick = onClick
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 9.dp),
+            color = AppColors.AccentSoft,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
     }
 }
 
