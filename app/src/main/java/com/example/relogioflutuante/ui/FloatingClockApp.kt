@@ -99,8 +99,7 @@ fun FloatingClockApp(permissionRefresh: Int) {
                     setupFromMenu = true
                     showSetup = true
                 },
-                onOpenAbout = { showAbout = true },
-                onSupportPix = copyPix
+                onOpenAbout = { showAbout = true }
             )
         },
         bottomBar = {
@@ -117,8 +116,7 @@ fun FloatingClockApp(permissionRefresh: Int) {
                         setupFromMenu = true
                         showSetup = true
                     },
-                    onMessage = showMessage,
-                    onCopyPix = copyPix
+                    onMessage = showMessage
                 )
                 MainSection.COUNTDOWN -> CountdownScreen()
                 MainSection.ALARMS -> AlarmScreen(permissionRefresh, showMessage)
@@ -134,7 +132,11 @@ fun FloatingClockApp(permissionRefresh: Int) {
         }
     }
 
-    if (showAbout) AboutDialog(onDismiss = { showAbout = false }, onCopyPix = copyPix)
+    if (showAbout) AboutDialog(
+        onDismiss = { showAbout = false },
+        onCopyPix = copyPix,
+        onMessage = showMessage
+    )
 }
 
 @Composable

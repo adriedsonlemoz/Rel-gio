@@ -15,7 +15,7 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Presets rápidos de overlay: `Jogo`, `Discreto` e `Cronômetro`, aplicando formato, tamanho, opacidade e bloqueio em um toque.
 - Ao bloquear a posição, a janela usa `FLAG_NOT_TOUCHABLE`, deixando os toques passarem integralmente para o jogo.
 - Posição lembrada separadamente em retrato e paisagem.
-- Menu principal refinado em folha inferior, com acesso a `Permissões e configuração`, `Sobre` e atalho de apoio via PIX.
+- Menu principal refinado em folha inferior, com acesso a `Permissões e configuração` e `Sobre`.
 - Ativação direta pela tela Relógio, sem precisar entrar primeiro na aba Sobrepor.
 - Atalho opcional no painel de Configurações Rápidas do Android para ativar/desativar o relógio flutuante sem abrir o aplicativo.
 - Guia completo de configuração disponível pelo menu para permissões e restrições de APK instalado fora da Play Store.
@@ -28,7 +28,7 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Cada alarme pode escolher som (alarme, toque, notificação ou silencioso), vibração e soneca de 5, 10 ou 15 minutos, ou deixar a soneca desativada.
 - Alarmes usam horário real do Android, podem tocar com áudio/vibração e são restaurados após reinicialização ou mudanças de horário/fuso.
 - Ícone próprio do aplicativo com variantes normal, redonda, adaptativa e monocromática, mantendo os elementos principais dentro da área segura dos launchers Android.
-- Card opcional de apoio ao projeto com chave PIX copiável (`adriedson@outlook.com`) e feedback visual ao copiar.
+- A área `Sobre` concentra versão, histórico recente, diagnóstico rápido e apoio opcional por PIX (`adriedson@outlook.com`), com feedback ao copiar.
 
 ## Primeiro uso e permissões
 
@@ -48,7 +48,7 @@ Os fusos mundiais usam o instante real fornecido pelo Android. O ajuste manual d
 
 ## Alarmes
 
-A aba `Alarmes` permite criar alarmes únicos ou recorrentes por dias da semana. O nome é opcional, cada item pode ser ativado/desativado e os alarmes salvos permanecem no aparelho. Alarmes de uma única vez são desativados automaticamente depois de tocar; os recorrentes são reagendados. A versão 1.4.0 cria uma única vez três alarmes diários predefinidos no fuso `America/Sao_Paulo`: `Zyrvorthian Corvith` às 16:55, `Zyrvorthian Ortson` às 18:55 e `Zyrvorthian Zulanka` às 19:55. Depois de criados, eles podem ser editados, desativados ou excluídos normalmente.
+A aba `Alarmes` permite criar alarmes únicos ou recorrentes por dias da semana. O nome é opcional, cada item pode ser ativado/desativado e os alarmes salvos permanecem no aparelho. Alarmes de uma única vez são desativados automaticamente depois de tocar; os recorrentes são reagendados. A versão 1.4.0 cria uma única vez três alarmes diários predefinidos no fuso `America/Sao_Paulo`: `Zyrvorthian Corvith` às 15:55, `Zyrvorthian Ortson` às 18:55 e `Zyrvorthian Zulanka` às 19:55. Depois de criados, eles podem ser editados, desativados ou excluídos normalmente.
 
 No Android 12 ou superior, o aplicativo verifica o acesso especial **Alarmes e lembretes**. Com o acesso liberado, usa alarmes exatos para maior precisão. Sem esse acesso, mantém um agendamento compatível menos preciso, sujeito aos atrasos que o Android pode aplicar. No Android 13 ou superior, a tela também solicita a permissão de notificações quando necessária.
 
@@ -107,6 +107,10 @@ O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow tamb�
 - `app/src/test/`: testes unitários.
 - `MainActivity.kt`: ponto de entrada e atualização de estado ao retornar das Configurações.
 
+## Sobre e diagnóstico
+
+A área `Sobre` apresenta as últimas mudanças em cards, versão atual e um diagnóstico rápido com estado do overlay, método de apresentação, Acessibilidade, permissão de sobreposição, alarmes exatos e notificações. O diagnóstico pode ser copiado para facilitar suporte em aparelhos com comportamento diferente. O PIX permanece somente nessa área, evitando ocupar espaço na tela principal.
+
 ## Build
 
 - Android SDK 36.
@@ -120,8 +124,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.5.0`
-- `versionCode`: `24`
+- `versionName`: `1.6.0`
+- `versionCode`: `25`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada

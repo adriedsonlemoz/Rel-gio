@@ -21,7 +21,6 @@ import com.example.relogioflutuante.ui.components.ClockOverlayActionCard
 import com.example.relogioflutuante.ui.components.ClockTimeActions
 import com.example.relogioflutuante.ui.components.InfoCard
 import com.example.relogioflutuante.ui.components.TimeAdjustDialog
-import com.example.relogioflutuante.ui.components.SupportPixCard
 import com.example.relogioflutuante.ui.components.TimeCard
 import com.example.relogioflutuante.ui.components.timezones.WorldClocksCard
 import com.example.relogioflutuante.ui.dialogs.timezones.WorldClockPickerDialog
@@ -35,8 +34,7 @@ fun ClockScreen(
     permissionRefresh: Int,
     controller: OverlayActivationController,
     onOpenSetup: () -> Unit,
-    onMessage: (String) -> Unit = {},
-    onCopyPix: () -> Unit = {}
+    onMessage: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     var showAdjust by remember { mutableStateOf(false) }
@@ -133,8 +131,6 @@ fun ClockScreen(
         InfoCard(
             "O ajuste não altera o relógio do Android. Ele muda apenas a hora exibida pelo app e pelo relógio flutuante."
         )
-
-        SupportPixCard(onCopyPix = onCopyPix)
     }
 
     if (worldClocks.showPicker) {

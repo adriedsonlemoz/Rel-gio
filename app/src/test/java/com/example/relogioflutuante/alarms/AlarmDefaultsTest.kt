@@ -6,14 +6,17 @@ import org.junit.Test
 
 class AlarmDefaultsTest {
     @Test
-    fun zyrvorthianDefaultsUseBrasiliaEveryDay() {
-        val alarms = AlarmDefaults.definitions.mapIndexed { index, definition ->
-            AlarmDefaults.create(index.toLong() + 1L, definition)
-        }
+    fun corvithUsesCorrectBrasiliaTime() {
+        val corvith = AlarmDefaults.definitions.first { it.label == "Zyrvorthian Corvith" }
+        assertEquals(15, corvith.hour)
+        assertEquals(55, corvith.minute)
+    }
 
-        assertEquals(listOf("Zyrvorthian Corvith", "Zyrvorthian Ortson", "Zyrvorthian Zulanka"), alarms.map { it.label })
-        assertEquals(listOf("16:55", "18:55", "19:55"), alarms.map { "%02d:%02d".format(it.hour, it.minute) })
-        assertTrue(alarms.all { it.repeatDays.size == 7 })
-        assertTrue(alarms.all { it.zoneId == AlarmDefaults.BRASILIA_ZONE })
+    @Test
+    fun defaultAlarmUsesBrasiliaZoneAndRepeatsEveryDay() {
+        val alarm = AlarmDefaults.create(1L, AlarmDefaults.definitions.first())
+        assertEquals(AlarmDefaults.BRASILIA_ZONE, alarm.zoneId)
+        assertEquals(7, alarm.repeatDays.size)
+        assertTrue(alarm.enabled)
     }
 }

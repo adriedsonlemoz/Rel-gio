@@ -33,25 +33,43 @@ class AlarmRepository(context: Context) {
     }
 
     fun ensureDefaultAlarms(): List<Alarm> {
-        if (prefs.getBoolean(KEY_DEFAULTS_V1_SEEDED, false)) return emptyList()
         val current = all().toMutableList()
-        val added = mutableListOf<Alarm>()
-        AlarmDefaults.definitions.forEach { definition ->
-            val exists = current.any {
-                it.hour == definition.hour &&
-                    it.minute == definition.minute &&
-                    it.label == definition.label &&
-                    it.zoneId == AlarmDefaults.BRASILIA_ZONE
+        val changed = migrateCorvithPreset(current).toMutableList()
+        if (!prefs.getBoolean(KEY_DEFAULTS_V1_SEEDED, false)) {
+            AlarmDefaults.definitions.forEach { definition ->
+                val exists = current.any {
+                    it.hour == definition.hour &&
+                        it.minute == definition.minute &&
+                        it.label == definition.label &&
+                        it.zoneId == AlarmDefaults.BRASILIA_ZONE
+                }
+                if (!exists) {
+                    val alarm = AlarmDefaults.create(nextId(), definition)
+                    current += alarm
+                    changed += alarm
+                }
             }
-            if (!exists) {
-                val alarm = AlarmDefaults.create(nextId(), definition)
-                current += alarm
-                added += alarm
-            }
+            prefs.edit().putBoolean(KEY_DEFAULTS_V1_SEEDED, true).apply()
         }
-        write(current)
-        prefs.edit().putBoolean(KEY_DEFAULTS_V1_SEEDED, true).apply()
-        return added
+        if (changed.isNotEmpty()) write(current)
+        return changed
+    }
+
+    private fun migrateCorvithPreset(current: MutableList<Alarm>): List<Alarm> {
+        if (prefs.getBoolean(KEY_CORVITH_1555_MIGRATED, false)) return emptyList()
+        val changed = mutableListOf<Alarm>()
+        val index = current.indexOfFirst {
+            it.label == "Zyrvorthian Corvith" &&
+                it.hour == 16 && it.minute == 55 &&
+                it.zoneId == AlarmDefaults.BRASILIA_ZONE
+        }
+        if (index >= 0) {
+            val corrected = current[index].copy(hour = 15, minute = 55)
+            current[index] = corrected
+            changed += corrected
+        }
+        prefs.edit().putBoolean(KEY_CORVITH_1555_MIGRATED, true).apply()
+        return changed
     }
 
     private fun write(alarms: List<Alarm>) {
@@ -62,5 +80,6 @@ class AlarmRepository(context: Context) {
         const val KEY_ALARMS = "alarms_items_v1"
         const val KEY_NEXT_ID = "alarms_next_id_v1"
         const val KEY_DEFAULTS_V1_SEEDED = "alarms_defaults_zyrvorthian_v1"
+        const val KEY_CORVITH_1555_MIGRATED = "alarms_corvith_1555_migrated_v1"
     }
 }

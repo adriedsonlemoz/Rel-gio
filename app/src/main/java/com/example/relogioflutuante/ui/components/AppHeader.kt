@@ -34,8 +34,7 @@ import com.example.relogioflutuante.ui.theme.AppColors
 @Composable
 fun AppHeader(
     onOpenSetup: () -> Unit,
-    onOpenAbout: () -> Unit,
-    onSupportPix: () -> Unit
+    onOpenAbout: () -> Unit
 ) {
     var showMenuSheet by remember { mutableStateOf(false) }
 
@@ -106,7 +105,7 @@ fun AppHeader(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Acesse configurações, informações do app e apoio ao projeto.",
+                    text = "Acesse configurações e informações do aplicativo.",
                     color = AppColors.TextSecondary,
                     fontSize = 13.sp,
                     lineHeight = 18.sp
@@ -125,14 +124,6 @@ fun AppHeader(
                     onClick = {
                         showMenuSheet = false
                         onOpenAbout()
-                    }
-                )
-                HeaderMenuTile(
-                    title = "Apoiar com PIX",
-                    subtitle = "adriedson@outlook.com • toque para copiar",
-                    onClick = {
-                        showMenuSheet = false
-                        onSupportPix()
                     }
                 )
             }

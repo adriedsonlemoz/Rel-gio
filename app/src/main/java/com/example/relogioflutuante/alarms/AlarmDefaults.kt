@@ -9,7 +9,7 @@ object AlarmDefaults {
     data class Definition(val hour: Int, val minute: Int, val label: String)
 
     val definitions = listOf(
-        Definition(16, 55, "Zyrvorthian Corvith"),
+        Definition(15, 55, "Zyrvorthian Corvith"),
         Definition(18, 55, "Zyrvorthian Ortson"),
         Definition(19, 55, "Zyrvorthian Zulanka")
     )

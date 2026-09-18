@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.6.0
+
+- Removido o card de PIX da tela principal do Relógio; o apoio fica concentrado exclusivamente na área `Sobre`.
+- Removido o atalho direto de PIX do menu rápido para manter o cabeçalho mais limpo.
+- Área `Sobre` completamente reorganizada em um painel visual com versão atual, histórico recente, privacidade, diagnóstico e apoio ao projeto.
+- Adicionado histórico visual das últimas versões em cards com resumo das mudanças mais importantes.
+- Adicionado diagnóstico rápido mostrando Android/API, estado do overlay, método ativo, permissão para sobrepor apps, Acessibilidade, alarmes exatos e notificações.
+- Adicionado botão para copiar o diagnóstico completo, com feedback `Diagnóstico copiado`.
+- Corrigido o preset `Zyrvorthian Corvith` de 16:55 para **15:55 no horário de Brasília** (`America/Sao_Paulo`).
+- Incluída migração de atualização: o horário antigo é corrigido somente quando o alarme ainda corresponde exatamente ao preset de 16:55, preservando edições manuais com outro horário.
+- A migração reaproveita o mesmo ID e mantém som, vibração, soneca, estado ativo e demais opções do alarme.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.5.0
 
 - Adicionada configuração individual de som por alarme: alarme padrão, toque do telefone, som de notificação ou sem som.
