@@ -32,7 +32,8 @@ private data class OverlayRuntimeState(
 @Composable
 fun OverlayScreen(
     controller: OverlayActivationController,
-    onOpenSetup: () -> Unit
+    onOpenSetup: () -> Unit,
+    onMessage: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val capability = controller.capability
@@ -67,11 +68,15 @@ fun OverlayScreen(
                 mode = it
                 OverlayState.setMode(context, it)
             },
-            onEnableRecommended = controller.enableRecommendedOverlay,
+            onEnableRecommended = {
+                controller.enableRecommendedOverlay()
+                onMessage("Relógio flutuante ativado")
+            },
             onOpenSetup = onOpenSetup,
             onDisable = {
                 OverlayState.setEnabled(context, false)
                 context.stopService(Intent(context, OverlayService::class.java))
+                onMessage("Relógio flutuante desativado")
             }
         )
 
@@ -89,9 +94,10 @@ fun OverlayScreen(
                 OverlayAppearanceState.setOpacity(context, it)
                 appearance = OverlayAppearanceState.read(context)
             },
-            onLockedChange = {
-                OverlayAppearanceState.setPositionLocked(context, it)
+            onLockedChange = { locked ->
+                OverlayAppearanceState.setPositionLocked(context, locked)
                 appearance = OverlayAppearanceState.read(context)
+                onMessage(if (locked) "Posição bloqueada" else "Posição desbloqueada")
             }
         )
 

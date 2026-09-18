@@ -22,7 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.relogioflutuante.timezones.WorldClockCatalog
+import com.example.relogioflutuante.timezones.WorldClockTime
 import com.example.relogioflutuante.ui.theme.AppColors
+import java.time.Instant
+import java.time.ZoneId
 
 @Composable
 fun WorldClockPickerDialog(
@@ -32,20 +35,15 @@ fun WorldClockPickerDialog(
 ) {
     var query by remember { mutableStateOf("") }
     val results = remember(query) { WorldClockCatalog.search(query) }
+    val instant = remember { Instant.now() }
+    val localZone = remember { ZoneId.systemDefault() }
 
     Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            color = AppColors.SurfaceStrong,
-            shape = RoundedCornerShape(22.dp)
-        ) {
+        Surface(color = AppColors.SurfaceStrong, shape = RoundedCornerShape(22.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
+                Text("Adicionar fuso horário", color = AppColors.TextPrimary, fontSize = 18.sp)
                 Text(
-                    text = "Adicionar fuso horário",
-                    color = AppColors.TextPrimary,
-                    fontSize = 18.sp
-                )
-                Text(
-                    text = "Escolha uma cidade da lista pronta.",
+                    "UTC, diferença e horário já aparecem antes de adicionar.",
                     color = AppColors.TextSecondary,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 3.dp, bottom = 10.dp)
@@ -66,6 +64,7 @@ fun WorldClockPickerDialog(
                     items(results, key = { it.zoneId }) { entry ->
                         WorldClockPickerRow(
                             entry = entry,
+                            display = WorldClockTime.display(ZoneId.of(entry.zoneId), instant, localZone),
                             selected = entry.zoneId in selectedZoneIds,
                             onSelect = { onAdd(entry.zoneId) }
                         )

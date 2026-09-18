@@ -9,6 +9,7 @@ data class WorldClockDisplay(
     val time: String,
     val utcOffset: String,
     val relativeOffset: String,
+    val relativeDescription: String,
     val dayRelation: String?
 )
 
@@ -31,6 +32,7 @@ object WorldClockTime {
             time = zoneTime.format(timeFormatter),
             utcOffset = formatUtcOffset(zoneOffsetSeconds),
             relativeOffset = formatDifference(differenceSeconds),
+            relativeDescription = formatRelativeDescription(differenceSeconds),
             dayRelation = when {
                 dayDelta > 0 -> "amanhã"
                 dayDelta < 0 -> "ontem"
@@ -60,5 +62,18 @@ object WorldClockTime {
             hours == 0 -> "$sign${minutes}min"
             else -> "$sign${hours}h${minutes.toString().padStart(2, '0')}"
         }
+    }
+
+    fun formatRelativeDescription(totalSeconds: Int): String {
+        if (totalSeconds == 0) return "mesma hora"
+        val totalMinutes = abs(totalSeconds) / 60
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        val amount = when {
+            minutes == 0 -> "${hours}h"
+            hours == 0 -> "${minutes}min"
+            else -> "${hours}h ${minutes}min"
+        }
+        return if (totalSeconds > 0) "$amount à frente" else "$amount atrás"
     }
 }

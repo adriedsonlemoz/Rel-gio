@@ -3,6 +3,8 @@ package com.example.relogioflutuante.overlay
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
@@ -20,17 +22,18 @@ class OverlayWindowController(
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val factory = OverlayViewFactory(context)
     private val styler = OverlayViewStyler(factory)
+    private val handler = Handler(Looper.getMainLooper())
     private var binding: OverlayViewBinding? = null
     private var params: WindowManager.LayoutParams? = null
     private var lastRenderedTime: String? = null
     private var lastFinished: Boolean? = null
     private var lastAppearance: OverlayAppearance? = null
     private var lastOrientation: Int? = null
+    private val hideChrome = Runnable { setChromeVisible(false) }
 
     fun ensureVisible(): Boolean {
         if (binding != null) return true
         if (!canShow()) return false
-
         val viewBinding = factory.create(onClose)
         val appearance = OverlayAppearanceState.read(context)
         val (savedX, savedY) = OverlayPositionState.position(context)
@@ -38,15 +41,14 @@ class OverlayWindowController(
         params = layoutParams
         configureTouch(viewBinding, appearance)
         styler.apply(viewBinding, appearance)
-
         if (runCatching { windowManager.addView(viewBinding.root, layoutParams) }.isFailure) {
             params = null
             return false
         }
-
         binding = viewBinding
         lastAppearance = appearance
         lastOrientation = OverlayPositionState.orientation(context)
+        if (!appearance.positionLocked) showChromeTemporarily()
         viewBinding.root.post { clampToScreen(useSavedPosition = false) }
         return true
     }
@@ -69,9 +71,7 @@ class OverlayWindowController(
                     text = "TEMPO ESGOTADO"
                     setTextColor(Color.rgb(248, 113, 113))
                     visibility = View.VISIBLE
-                } else {
-                    visibility = View.GONE
-                }
+                } else visibility = View.GONE
             }
             lastFinished = finished
         }
@@ -93,6 +93,10 @@ class OverlayWindowController(
             configureTouch(currentBinding, appearance)
             updateFlags(appearance)
             lastAppearance = appearance
+            if (appearance.positionLocked) {
+                handler.removeCallbacks(hideChrome)
+                setChromeVisible(false)
+            } else showChromeTemporarily()
             currentBinding.root.post { clampToScreen(useSavedPosition = false) }
         }
         if (orientation != lastOrientation) {
@@ -104,8 +108,22 @@ class OverlayWindowController(
     private fun configureTouch(binding: OverlayViewBinding, appearance: OverlayAppearance) {
         binding.root.setOnTouchListener(
             if (appearance.positionLocked) null
-            else OverlayDragTouchListener(context, windowManager) { params }
+            else OverlayDragTouchListener(context, windowManager, { params }) { showChromeTemporarily() }
         )
+    }
+
+    private fun showChromeTemporarily() {
+        if (OverlayAppearanceState.read(context).positionLocked) return
+        setChromeVisible(true)
+        handler.removeCallbacks(hideChrome)
+        handler.postDelayed(hideChrome, CHROME_TIMEOUT_MS)
+    }
+
+    private fun setChromeVisible(visible: Boolean) {
+        val value = if (visible) View.VISIBLE else View.GONE
+        binding?.grip?.visibility = value
+        binding?.closeText?.visibility = value
+        binding?.root?.requestLayout()
     }
 
     private fun updateFlags(appearance: OverlayAppearance) {
@@ -131,11 +149,7 @@ class OverlayWindowController(
         runCatching { windowManager.updateViewLayout(root, layoutParams) }
     }
 
-    private fun createLayoutParams(
-        x: Int,
-        y: Int,
-        appearance: OverlayAppearance
-    ) = WindowManager.LayoutParams(
+    private fun createLayoutParams(x: Int, y: Int, appearance: OverlayAppearance) = WindowManager.LayoutParams(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
         windowType,
@@ -148,15 +162,13 @@ class OverlayWindowController(
     }
 
     private fun baseFlags(appearance: OverlayAppearance): Int {
-        var flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-        if (appearance.positionLocked) {
-            flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        }
+        var flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+        if (appearance.positionLocked) flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         return flags
     }
 
     fun hide() {
+        handler.removeCallbacks(hideChrome)
         binding?.root?.let { runCatching { windowManager.removeView(it) } }
         binding = null
         params = null
@@ -164,5 +176,9 @@ class OverlayWindowController(
         lastFinished = null
         lastAppearance = null
         lastOrientation = null
+    }
+
+    private companion object {
+        const val CHROME_TIMEOUT_MS = 2_000L
     }
 }

@@ -115,8 +115,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.2.2`
-- `versionCode`: `19`
+- `versionName`: `1.3.0`
+- `versionCode`: `20`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
@@ -136,4 +136,6 @@ A versão 1.2.0 adiciona uma aba própria de alarmes, com alarmes únicos ou rec
 A versão 1.2.1 revisa o fluxo de configuração do overlay. Android 13+ mantém o passo de configurações restritas quando necessário, com instruções de recuperação caso a opção demore a aparecer. Android 12 e anteriores seguem diretamente para Acessibilidade, evitando um passo inexistente nessas versões.
 ## Ícone do aplicativo na versão 1.2.2
 A versão 1.2.2 integra o novo ícone do Relógio Flutuante aos recursos nativos do Android. O projeto inclui variantes por densidade, ícone redondo, Adaptive Icon para Android 8.0+ e versão monocromática para ícones temáticos no Android 13+. A arte principal foi mantida com margem de segurança para evitar cortes em máscaras circulares, squircle e outros formatos de launcher.
+## Refinamento visual na versão 1.3.0
+A versão 1.3.0 reorganiza alarmes, fusos e opções de sobreposição a partir da análise de uso em aparelho real. Alarmes mostram a próxima ocorrência e o tempo restante; o editor ganhou seletor próprio de horário e dias sem rolagem. Fusos exibem UTC, diferença legível e horário atual tanto na lista quanto antes de adicionar. Feedbacks por snackbar confirmam ações importantes, os controles visuais usam uma paleta azul/ciano consistente e o overlay oculta automaticamente os botões de mover/fechar após alguns segundos para interferir menos no jogo.
 

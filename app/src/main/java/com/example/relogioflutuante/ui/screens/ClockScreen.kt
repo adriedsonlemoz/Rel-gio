@@ -33,7 +33,8 @@ import java.time.ZoneId
 fun ClockScreen(
     permissionRefresh: Int,
     controller: OverlayActivationController,
-    onOpenSetup: () -> Unit
+    onOpenSetup: () -> Unit,
+    onMessage: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     var showAdjust by remember { mutableStateOf(false) }
@@ -120,7 +121,9 @@ fun ClockScreen(
             instant = Instant.ofEpochMilli(System.currentTimeMillis()),
             localZone = ZoneId.systemDefault(),
             onAdd = worldClocks::openPicker,
-            onRemove = worldClocks::remove,
+            onRemove = { zoneId ->
+                if (worldClocks.remove(zoneId)) onMessage("Fuso horário removido")
+            },
             onMoveUp = worldClocks::moveUp,
             onMoveDown = worldClocks::moveDown
         )
@@ -133,7 +136,9 @@ fun ClockScreen(
     if (worldClocks.showPicker) {
         WorldClockPickerDialog(
             selectedZoneIds = worldClocks.zoneIds.toSet(),
-            onAdd = worldClocks::add,
+            onAdd = { zoneId ->
+                if (worldClocks.add(zoneId)) onMessage("Fuso horário adicionado")
+            },
             onDismiss = worldClocks::closePicker
         )
     }

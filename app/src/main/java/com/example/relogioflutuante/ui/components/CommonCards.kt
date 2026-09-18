@@ -18,31 +18,28 @@ import com.example.relogioflutuante.ui.theme.AppColors
 fun InfoCard(text: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = AppColors.Surface,
-        shape = RoundedCornerShape(16.dp)
+        color = AppColors.Surface.copy(alpha = 0.72f),
+        shape = RoundedCornerShape(13.dp)
     ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(15.dp),
-            color = AppColors.TextSecondary,
-            fontSize = 13.sp,
-            lineHeight = 19.sp
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Text("ⓘ", color = AppColors.AccentSoft, fontSize = 13.sp, modifier = Modifier.padding(end = 8.dp))
+            Text(
+                text = text,
+                color = AppColors.TextSecondary,
+                fontSize = 11.sp,
+                lineHeight = 16.sp
+            )
+        }
     }
 }
 
 @Composable
 fun StatusLine(label: String, value: String, good: Boolean) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            label,
-            modifier = Modifier.weight(1f),
-            color = AppColors.TextSecondary,
-            fontSize = 14.sp
-        )
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1f), color = AppColors.TextSecondary, fontSize = 14.sp)
         Text(
             value,
             color = if (good) AppColors.Success else AppColors.Warning,

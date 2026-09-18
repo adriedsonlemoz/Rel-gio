@@ -11,7 +11,8 @@ import kotlin.math.roundToInt
 class OverlayDragTouchListener(
     private val context: Context,
     private val windowManager: WindowManager,
-    private val paramsProvider: () -> WindowManager.LayoutParams?
+    private val paramsProvider: () -> WindowManager.LayoutParams?,
+    private val onInteraction: () -> Unit = {}
 ) : View.OnTouchListener {
     private var initialX = 0
     private var initialY = 0
@@ -22,6 +23,7 @@ class OverlayDragTouchListener(
         val params = paramsProvider() ?: return false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                onInteraction()
                 initialX = params.x
                 initialY = params.y
                 touchX = event.rawX
@@ -40,6 +42,7 @@ class OverlayDragTouchListener(
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 OverlayPositionState.savePosition(context, params.x, params.y)
+                onInteraction()
                 return true
             }
         }

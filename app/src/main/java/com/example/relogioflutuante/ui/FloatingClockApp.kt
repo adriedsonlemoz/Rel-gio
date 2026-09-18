@@ -10,13 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -33,6 +37,7 @@ import com.example.relogioflutuante.ui.screens.CountdownScreen
 import com.example.relogioflutuante.ui.screens.OverlayScreen
 import com.example.relogioflutuante.ui.screens.SetupScreen
 import com.example.relogioflutuante.ui.theme.AppColors
+import kotlinx.coroutines.launch
 
 @Composable
 fun FloatingClockApp(permissionRefresh: Int) {
@@ -42,6 +47,14 @@ fun FloatingClockApp(permissionRefresh: Int) {
     var showSetup by remember { mutableStateOf(false) }
     var setupFromMenu by remember { mutableStateOf(false) }
     val overlayActivation = rememberOverlayActivationController(permissionRefresh)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val showMessage: (String) -> Unit = { message ->
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 
     if (showSetup) {
         Box(
@@ -83,7 +96,8 @@ fun FloatingClockApp(permissionRefresh: Int) {
         },
         bottomBar = {
             MainBottomNavigation(section = section, onSectionChange = { section = it })
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         ResponsiveContent(Modifier.padding(innerPadding)) {
             when (section) {
@@ -93,14 +107,19 @@ fun FloatingClockApp(permissionRefresh: Int) {
                     onOpenSetup = {
                         setupFromMenu = true
                         showSetup = true
-                    }
+                    },
+                    onMessage = showMessage
                 )
                 MainSection.COUNTDOWN -> CountdownScreen()
-                MainSection.ALARMS -> AlarmScreen(permissionRefresh)
-                MainSection.OVERLAY -> OverlayScreen(overlayActivation) {
-                    setupFromMenu = true
-                    showSetup = true
-                }
+                MainSection.ALARMS -> AlarmScreen(permissionRefresh, showMessage)
+                MainSection.OVERLAY -> OverlayScreen(
+                    controller = overlayActivation,
+                    onOpenSetup = {
+                        setupFromMenu = true
+                        showSetup = true
+                    },
+                    onMessage = showMessage
+                )
             }
         }
     }
@@ -113,7 +132,7 @@ private fun ResponsiveContent(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    BoxWithConstraints(modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier.fillMaxSize().clipToBounds()) {
         val widthDp = maxWidth.value.toInt()
         val widthClass = ScreenLayoutRules.widthClass(widthDp)
         val horizontal = ScreenLayoutRules.horizontalPaddingDp(widthDp).dp

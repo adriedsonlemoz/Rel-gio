@@ -31,15 +31,12 @@ enum class MainSection(val label: String, @DrawableRes val iconRes: Int) {
 }
 
 @Composable
-fun MainBottomNavigation(
-    section: MainSection,
-    onSectionChange: (MainSection) -> Unit
-) {
+fun MainBottomNavigation(section: MainSection, onSectionChange: (MainSection) -> Unit) {
     Surface(color = AppColors.Surface) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 7.dp)
+                .padding(horizontal = 8.dp, vertical = 5.dp)
         ) {
             MainSection.entries.forEach { item ->
                 NavigationItem(
@@ -54,33 +51,28 @@ fun MainBottomNavigation(
 }
 
 @Composable
-private fun NavigationItem(
-    modifier: Modifier,
-    item: MainSection,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    val background = if (selected) AppColors.Accent.copy(alpha = 0.18f) else AppColors.Surface
+private fun NavigationItem(modifier: Modifier, item: MainSection, selected: Boolean, onClick: () -> Unit) {
+    val background = if (selected) AppColors.Accent.copy(alpha = 0.13f) else AppColors.Surface
     val contentColor = if (selected) AppColors.AccentSoft else AppColors.TextSecondary
     Column(
         modifier = modifier
-            .padding(horizontal = 3.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .padding(horizontal = 5.dp)
+            .clip(RoundedCornerShape(13.dp))
             .background(background)
             .clickable(onClick = onClick)
-            .padding(vertical = 7.dp),
+            .padding(vertical = 5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
             painter = painterResource(item.iconRes),
             contentDescription = item.label,
             tint = contentColor,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(19.dp)
         )
         Text(
             item.label,
             color = contentColor,
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
         )
     }

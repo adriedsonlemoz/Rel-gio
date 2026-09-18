@@ -11,8 +11,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -57,57 +60,68 @@ fun OverlayAppearanceCard(
                 SizeChip("Médio", OverlaySize.MEDIUM, appearance, onSizeChange)
                 SizeChip("Grande", OverlaySize.LARGE, appearance, onSizeChange)
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(13.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Opacidade", color = AppColors.TextPrimary, modifier = Modifier.weight(1f))
-                Text("${appearance.opacityPercent}%", color = AppColors.TextSecondary)
+                Text("${appearance.opacityPercent}%", color = AppColors.AccentSoft, fontWeight = FontWeight.SemiBold)
             }
             Slider(
                 value = appearance.opacityPercent.toFloat(),
                 onValueChange = { onOpacityChange(it.roundToInt()) },
                 valueRange = 40f..100f,
-                steps = 5
+                colors = SliderDefaults.colors(
+                    thumbColor = AppColors.AccentSoft,
+                    activeTrackColor = AppColors.Accent,
+                    inactiveTrackColor = AppColors.SurfaceStrong,
+                    activeTickColor = AppColors.Accent,
+                    inactiveTickColor = AppColors.SurfaceStrong
+                )
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Bloquear posição", color = AppColors.TextPrimary)
                     Text(
-                        "Quando bloqueado, a janela não captura nenhum toque do jogo.",
+                        "Bloqueado, o relógio não intercepta toques do jogo.",
                         color = AppColors.TextSecondary,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp
+                        fontSize = 11.sp,
+                        lineHeight = 15.sp
                     )
                 }
-                Switch(checked = appearance.positionLocked, onCheckedChange = onLockedChange)
+                Switch(
+                    checked = appearance.positionLocked,
+                    onCheckedChange = onLockedChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = AppColors.TextPrimary,
+                        checkedTrackColor = AppColors.Accent,
+                        uncheckedTrackColor = AppColors.SurfaceStrong
+                    )
+                )
             }
         }
     }
 }
 
 @Composable
-private fun FormatChip(
-    label: String,
-    value: OverlayTimeFormat,
-    appearance: OverlayAppearance,
-    onChange: (OverlayTimeFormat) -> Unit
-) {
-    FilterChip(
-        selected = appearance.timeFormat == value,
-        onClick = { onChange(value) },
-        label = { Text(label) }
-    )
+private fun FormatChip(label: String, value: OverlayTimeFormat, appearance: OverlayAppearance, onChange: (OverlayTimeFormat) -> Unit) {
+    StyledChip(label, appearance.timeFormat == value) { onChange(value) }
 }
 
 @Composable
-private fun SizeChip(
-    label: String,
-    value: OverlaySize,
-    appearance: OverlayAppearance,
-    onChange: (OverlaySize) -> Unit
-) {
+private fun SizeChip(label: String, value: OverlaySize, appearance: OverlayAppearance, onChange: (OverlaySize) -> Unit) {
+    StyledChip(label, appearance.size == value) { onChange(value) }
+}
+
+@Composable
+private fun StyledChip(label: String, selected: Boolean, onClick: () -> Unit) {
     FilterChip(
-        selected = appearance.size == value,
-        onClick = { onChange(value) },
-        label = { Text(label) }
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        colors = FilterChipDefaults.filterChipColors(
+            containerColor = AppColors.SurfaceStrong,
+            labelColor = AppColors.TextSecondary,
+            selectedContainerColor = AppColors.Accent.copy(alpha = 0.28f),
+            selectedLabelColor = AppColors.AccentSoft
+        )
     )
 }

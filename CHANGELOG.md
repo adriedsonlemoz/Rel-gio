@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.3.0
+
+- Refinamento visual amplo baseado na revisão do fluxo real em vídeo.
+- Alarmes agora exibem a próxima ocorrência e quanto tempo falta para tocar, usando a mesma regra do agendamento.
+- Ao salvar ou ativar um alarme, o app informa o tempo restante por snackbar; exclusão e desativação também recebem feedback.
+- Reformulado o card de alarmes com horário em maior destaque, dias recorrentes em chips, próxima ocorrência e menu compacto de ações.
+- Editor de alarme não usa mais campos de texto para hora/minuto; foi substituído por seletor próprio com controles de incremento e decremento.
+- Os sete dias da semana agora cabem no editor sem rolagem horizontal.
+- Avisos de permissão de alarmes foram compactados em banner de correção, reduzindo espaço ocupado na tela.
+- Lista de fusos agora prioriza cidade, UTC, diferença legível para o horário local e hora atual; o ZoneId técnico deixa de poluir a interface.
+- Seletor de fusos mostra UTC, diferença e horário antes de adicionar uma cidade.
+- Controles de reordenação/remoção de fusos foram movidos para menu compacto e deixam de aparecer quando há apenas um item.
+- Adicionar e remover fuso horário agora gera feedback por snackbar.
+- Cores de chips, switches e slider foram unificadas na paleta azul/ciano do aplicativo.
+- Slider de opacidade foi simplificado e recebeu valor percentual em destaque.
+- Métodos alternativos de overlay foram compactados em linhas de status em vez de grandes botões empilhados.
+- Controles de mover/fechar do relógio flutuante somem automaticamente após 2 segundos de inatividade e reaparecem ao interagir.
+- Feedback visual adicionado ao ativar/desativar o overlay e bloquear/desbloquear sua posição.
+- Cards informativos foram compactados e a navegação inferior recebeu seleção visual mais discreta.
+- Conteúdo rolável agora é recortado à área útil para evitar desenho visual por trás do cabeçalho.
+- Adicionados testes para texto relativo de fusos e tempo restante dos alarmes.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.2.2
 
 - Integrado novo ícone oficial do Relógio Flutuante ao aplicativo.

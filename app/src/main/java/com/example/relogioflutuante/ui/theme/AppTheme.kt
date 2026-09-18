@@ -22,12 +22,17 @@ fun FloatingClockTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = darkColorScheme(
             primary = AppColors.Accent,
-            background = AppColors.Background,
-            surface = AppColors.Surface,
-            surfaceVariant = AppColors.SurfaceStrong,
             onPrimary = Color.White,
+            secondary = AppColors.AccentSoft,
+            onSecondary = AppColors.Background,
+            tertiary = AppColors.Success,
+            background = AppColors.Background,
             onBackground = AppColors.TextPrimary,
-            onSurface = AppColors.TextPrimary
+            surface = AppColors.Surface,
+            onSurface = AppColors.TextPrimary,
+            surfaceVariant = AppColors.SurfaceStrong,
+            onSurfaceVariant = AppColors.TextSecondary,
+            outline = AppColors.TextSecondary.copy(alpha = 0.45f)
         ),
         content = content
     )

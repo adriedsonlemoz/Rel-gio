@@ -34,12 +34,18 @@ class WorldClockUiState internal constructor(
         showPicker = false
     }
 
-    fun add(zoneId: String) {
-        update(WorldClockListRules.add(zoneIds, zoneId))
+    fun add(zoneId: String): Boolean {
+        val next = WorldClockListRules.add(zoneIds, zoneId)
+        val changed = next != zoneIds
+        update(next)
+        return changed
     }
 
-    fun remove(zoneId: String) {
-        update(WorldClockListRules.remove(zoneIds, zoneId))
+    fun remove(zoneId: String): Boolean {
+        val next = WorldClockListRules.remove(zoneIds, zoneId)
+        val changed = next != zoneIds
+        update(next)
+        return changed
     }
 
     fun moveUp(index: Int) {

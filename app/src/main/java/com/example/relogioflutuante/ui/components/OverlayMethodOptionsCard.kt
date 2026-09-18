@@ -1,16 +1,18 @@
 package com.example.relogioflutuante.ui.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,40 +33,84 @@ fun OverlayMethodOptionsCard(
         colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         shape = RoundedCornerShape(18.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text("Outros métodos", color = AppColors.TextPrimary, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(5.dp))
-            Text(
-                "Use somente se quiser trocar o método atual ou configurar uma alternativa.",
-                color = AppColors.TextSecondary,
-                fontSize = 12.sp
-            )
-            Spacer(Modifier.height(10.dp))
-            OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = onAccessibility) {
+        Column {
+            Column(Modifier.padding(horizontal = 15.dp, vertical = 12.dp)) {
+                Text("Outros métodos", color = AppColors.TextPrimary, fontWeight = FontWeight.Bold)
                 Text(
-                    if (capability.accessibilityServiceEnabled) {
-                        "Acessibilidade · configurada"
-                    } else "Configurar Acessibilidade"
+                    "Alternativas para trocar o método atual.",
+                    color = AppColors.TextSecondary,
+                    fontSize = 11.sp
                 )
             }
-            Spacer(Modifier.height(7.dp))
-            OutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
+            MethodRow(
+                title = "Acessibilidade",
+                status = if (capability.accessibilityServiceEnabled) "Configurada ✓" else "Configurar",
+                good = capability.accessibilityServiceEnabled,
+                onClick = onAccessibility
+            )
+            Divider()
+            MethodRow(
+                title = "Sobreposição normal",
+                status = when {
+                    capability.canDrawOverlays -> "Disponível ✓"
+                    capability.isLowRamDevice -> "Indisponível"
+                    else -> "Configurar"
+                },
+                good = capability.canDrawOverlays,
                 enabled = capability.canDrawOverlays || !capability.isLowRamDevice,
                 onClick = onSystemOverlay
-            ) {
-                Text(
-                    when {
-                        capability.canDrawOverlays -> "Sobreposição normal · disponível"
-                        capability.isLowRamDevice -> "Sobreposição normal indisponível"
-                        else -> "Configurar sobreposição normal"
-                    }
-                )
-            }
-            Spacer(Modifier.height(7.dp))
-            OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = onNotification) {
-                Text(if (notificationsAllowed) "Usar modo de notificação" else "Configurar notificações")
-            }
+            )
+            Divider()
+            MethodRow(
+                title = "Notificação",
+                status = if (notificationsAllowed) "Disponível ✓" else "Configurar",
+                good = notificationsAllowed,
+                onClick = onNotification
+            )
         }
     }
+}
+
+@Composable
+private fun MethodRow(
+    title: String,
+    status: String,
+    good: Boolean,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 15.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            title,
+            modifier = Modifier.weight(1f),
+            color = if (enabled) AppColors.TextPrimary else AppColors.TextSecondary.copy(alpha = 0.5f),
+            fontSize = 13.sp
+        )
+        Text(
+            status,
+            color = when {
+                !enabled -> AppColors.TextSecondary.copy(alpha = 0.5f)
+                good -> AppColors.Success
+                else -> AppColors.AccentSoft
+            },
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        Text("›", color = AppColors.TextSecondary, fontSize = 18.sp)
+    }
+}
+
+@Composable
+private fun Divider() {
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 15.dp),
+        color = AppColors.TextSecondary.copy(alpha = 0.08f)
+    )
 }
