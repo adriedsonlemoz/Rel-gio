@@ -1,5 +1,6 @@
 package com.example.relogioflutuante.ui.screens
 
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,6 +55,7 @@ fun ClockScreen(
     val overlayAction = ClockOverlayActionResolver.resolve(
         canDrawOverlays = capability.canDrawOverlays,
         accessibilityEnabled = capability.accessibilityServiceEnabled,
+        restrictedSettingsRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
         restrictedSettingsConfirmed = restrictedConfirmed,
         restrictedSettingsOpened = restrictedOpened,
         floatingOverlayEnabled = floatingOverlayEnabled
@@ -95,6 +97,12 @@ fun ClockScreen(
                         SetupGuideState.setRestrictedSettingsConfirmed(context, true)
                     }
                 )
+            },
+            onRetryRestrictedSettings = {
+                SetupGuideState.setRestrictedSettingsConfirmed(context, false)
+                SetupGuideState.setRestrictedSettingsOpened(context, true)
+                controller.openAppDetails()
+                overlayRefresh++
             },
             onOpenFullGuide = onOpenSetup
         )

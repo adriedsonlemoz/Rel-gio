@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import com.example.relogioflutuante.ui.theme.AppColors
 fun ClockOverlayActionCard(
     action: ClockOverlayAction,
     onPrimaryAction: () -> Unit,
+    onRetryRestrictedSettings: () -> Unit,
     onOpenFullGuide: () -> Unit
 ) {
     val copy = ClockOverlayActionCopy.forAction(action)
@@ -71,9 +73,18 @@ fun ClockOverlayActionCard(
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
                 ) { Text(copy.buttonLabel) }
             }
+            if (action == ClockOverlayAction.CONFIRM_RESTRICTED_SETTINGS ||
+                action == ClockOverlayAction.OPEN_ACCESSIBILITY
+            ) {
+                Spacer(Modifier.height(5.dp))
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onRetryRestrictedSettings
+                ) { Text("Abrir Informações do app novamente") }
+            }
             if (action != ClockOverlayAction.ACTIVE) {
                 Spacer(Modifier.height(5.dp))
-                androidx.compose.material3.TextButton(
+                TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onOpenFullGuide
                 ) { Text("Ver guia completo") }
@@ -92,19 +103,19 @@ private data class ClockOverlayActionCopy(
         fun forAction(action: ClockOverlayAction): ClockOverlayActionCopy = when (action) {
             ClockOverlayAction.OPEN_RESTRICTED_SETTINGS -> ClockOverlayActionCopy(
                 "Configuração necessária",
-                "Primeiro libere as configurações restritas do APK. Na tela do Android, use ⋮ > Permitir configurações restritas.",
+                "Abra as Informações do app. Aguarde alguns segundos e use ⋮ > Permitir configurações restritas.",
                 "1. Liberar configurações",
                 AppColors.Warning
             )
             ClockOverlayAction.CONFIRM_RESTRICTED_SETTINGS -> ClockOverlayActionCopy(
                 "Passo 1 aberto",
-                "Se você já tocou em “Permitir configurações restritas”, continue para a Acessibilidade.",
-                "Já permiti · continuar",
+                "Continue somente depois de confirmar “Permitir configurações restritas”. Se a opção não apareceu ainda, abra as Informações do app novamente.",
+                "Já permiti · ir para Acessibilidade",
                 AppColors.Warning
             )
             ClockOverlayAction.OPEN_ACCESSIBILITY -> ClockOverlayActionCopy(
                 "Falta ativar Acessibilidade",
-                "Ative “Relógio Flutuante sobre apps”. Ao voltar, a janela será ativada automaticamente.",
+                "Ative “Relógio Flutuante sobre apps”. Se estiver bloqueado ou acinzentado, volte às Informações do app e revise o passo 1.",
                 "2. Ativar Acessibilidade",
                 AppColors.Warning
             )

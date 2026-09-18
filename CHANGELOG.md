@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.1
+
+- Revisado o fluxo de ativação do overlay na etapa final de QA.
+- Corrigido o assistente para exigir **Permitir configurações restritas** somente no Android 13 ou superior; Android 12 e anteriores agora seguem diretamente para Acessibilidade.
+- Melhoradas as instruções para aparelhos em que a opção **Permitir configurações restritas** demora a aparecer ou a aceitar a confirmação.
+- Adicionado botão para reabrir rapidamente **Informações do app** quando a Acessibilidade ainda estiver bloqueada/acinzentada.
+- O passo de Acessibilidade agora oferece **Rever passo 1** apenas em versões do Android nas quais a configuração restrita pode ser necessária.
+- Mantida a revalidação automática do estado ao retornar das Configurações do Android.
+- Revalidadas regras centrais de alarmes, repetição semanal, fusos horários, contagem regressiva e resolução do fluxo de permissões.
+- Mantida a regra de nenhum arquivo Kotlin ultrapassar 250 linhas.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.2.0
 
 - Adicionada nova aba **Alarmes** à navegação principal.

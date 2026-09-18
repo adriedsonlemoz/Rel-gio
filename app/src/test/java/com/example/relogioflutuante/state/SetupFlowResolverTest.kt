@@ -5,10 +5,26 @@ import org.junit.Test
 
 class SetupFlowResolverTest {
     @Test
-    fun startsWithRestrictedSettingsForSideloadedSetup() {
+    fun android13PlusStartsWithRestrictedSettingsWhenNeeded() {
         assertEquals(
             SetupPhase.RESTRICTED_SETTINGS,
-            SetupFlowResolver.resolve(accessibilityEnabled = false, restrictedSettingsConfirmed = false)
+            SetupFlowResolver.resolve(
+                accessibilityEnabled = false,
+                restrictedSettingsRequired = true,
+                restrictedSettingsConfirmed = false
+            )
+        )
+    }
+
+    @Test
+    fun android12AndEarlierGoDirectlyToAccessibility() {
+        assertEquals(
+            SetupPhase.ACCESSIBILITY,
+            SetupFlowResolver.resolve(
+                accessibilityEnabled = false,
+                restrictedSettingsRequired = false,
+                restrictedSettingsConfirmed = false
+            )
         )
     }
 
@@ -16,7 +32,11 @@ class SetupFlowResolverTest {
     fun advancesToAccessibilityAfterManualConfirmation() {
         assertEquals(
             SetupPhase.ACCESSIBILITY,
-            SetupFlowResolver.resolve(accessibilityEnabled = false, restrictedSettingsConfirmed = true)
+            SetupFlowResolver.resolve(
+                accessibilityEnabled = false,
+                restrictedSettingsRequired = true,
+                restrictedSettingsConfirmed = true
+            )
         )
     }
 
@@ -24,7 +44,11 @@ class SetupFlowResolverTest {
     fun accessibilityEnabledAlwaysMeansReady() {
         assertEquals(
             SetupPhase.READY,
-            SetupFlowResolver.resolve(accessibilityEnabled = true, restrictedSettingsConfirmed = false)
+            SetupFlowResolver.resolve(
+                accessibilityEnabled = true,
+                restrictedSettingsRequired = true,
+                restrictedSettingsConfirmed = false
+            )
         )
     }
 }

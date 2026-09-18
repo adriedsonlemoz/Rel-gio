@@ -1,5 +1,6 @@
 package com.example.relogioflutuante.ui.screens
 
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Icon
@@ -39,8 +40,10 @@ fun SetupScreen(
     val restrictedConfirmed = remember(permissionRefresh) {
         SetupGuideState.isRestrictedSettingsConfirmed(context)
     }
+    val restrictedSettingsRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     val phase = SetupFlowResolver.resolve(
         accessibilityEnabled = capability.accessibilityServiceEnabled,
+        restrictedSettingsRequired = restrictedSettingsRequired,
         restrictedSettingsConfirmed = restrictedConfirmed
     )
 
@@ -49,7 +52,11 @@ fun SetupScreen(
         horizontalPadding = 18.dp,
         horizontalAlignment = Alignment.Start
     ) {
-        SetupHeader(showBack = showBack, onBack = onBack)
+        SetupHeader(
+            showBack = showBack,
+            restrictedSettingsRequired = restrictedSettingsRequired,
+            onBack = onBack
+        )
 
         when (phase) {
             SetupPhase.RESTRICTED_SETTINGS -> RestrictedSettingsStep(
@@ -60,6 +67,7 @@ fun SetupScreen(
                 }
             )
             SetupPhase.ACCESSIBILITY -> AccessibilitySetupStep(
+                showRestrictedSettingsReview = restrictedSettingsRequired,
                 onOpenAccessibility = controller.openAccessibilitySettings,
                 onReviewStepOne = {
                     SetupGuideState.setRestrictedSettingsConfirmed(context, false)
@@ -76,7 +84,7 @@ fun SetupScreen(
 
         InfoCard(
             when (phase) {
-                SetupPhase.RESTRICTED_SETTINGS -> "Essa liberação é exigida pelo Android para APKs instalados fora da Play Store."
+                SetupPhase.RESTRICTED_SETTINGS -> "No Android 13 ou superior, APKs instalados fora da loja podem exigir essa liberação antes da Acessibilidade."
                 SetupPhase.ACCESSIBILITY -> "Não é necessário configurar “Sobrepor a outros apps” neste aparelho se a Acessibilidade funcionar."
                 SetupPhase.READY -> "Depois de concluído, essa configuração fica salva. Você só volta aqui se quiser trocar o método."
             }
@@ -85,7 +93,11 @@ fun SetupScreen(
 }
 
 @Composable
-private fun SetupHeader(showBack: Boolean, onBack: () -> Unit) {
+private fun SetupHeader(
+    showBack: Boolean,
+    restrictedSettingsRequired: Boolean,
+    onBack: () -> Unit
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (showBack) {
             IconButton(onClick = onBack) {
@@ -104,7 +116,11 @@ private fun SetupHeader(showBack: Boolean, onBack: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                "São apenas dois passos na primeira configuração.",
+                if (restrictedSettingsRequired) {
+                    "São apenas dois passos na primeira configuração."
+                } else {
+                    "Neste Android, basta ativar a Acessibilidade."
+                },
                 color = AppColors.TextSecondary,
                 fontSize = 12.sp
             )

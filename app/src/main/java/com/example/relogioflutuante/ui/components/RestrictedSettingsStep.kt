@@ -40,10 +40,17 @@ fun RestrictedSettingsStep(
             )
             Spacer(Modifier.height(7.dp))
             Text(
-                "Na tela que abrir, toque em ⋮ no canto superior direito e escolha “Permitir configurações restritas”. Depois volte para cá.",
+                "Na tela que abrir, aguarde alguns segundos e toque em ⋮ no canto superior direito. Escolha “Permitir configurações restritas” e confirme.",
                 color = AppColors.TextSecondary,
                 fontSize = 13.sp,
                 lineHeight = 18.sp
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Se a opção ainda não aparecer ou não aceitar o toque, permaneça um pouco na tela, abra o menu ⋮ novamente ou volte aqui e abra as Informações do app outra vez.",
+                color = AppColors.Warning,
+                fontSize = 12.sp,
+                lineHeight = 17.sp
             )
             Spacer(Modifier.height(12.dp))
             Button(
@@ -55,7 +62,7 @@ fun RestrictedSettingsStep(
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onContinue
-            ) { Text("Já permiti · continuar") }
+            ) { Text("Já permiti · ir para Acessibilidade") }
         }
     }
 }

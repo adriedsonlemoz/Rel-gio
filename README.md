@@ -27,7 +27,9 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 
 ## Primeiro uso e permissões
 
-Em APKs instalados fora da Play Store, algumas versões do Android exigem liberar manualmente **Permitir configurações restritas** antes de ativar um serviço de Acessibilidade. A própria tela Relógio mostra o estado e conduz o processo: primeiro abre `Informações do app`, depois leva à Acessibilidade e, ao voltar, revalida o estado automaticamente. O usuário ainda precisa tocar no menu de três pontos e confirmar a opção, pois o Android não fornece API pública para concedê-la automaticamente.
+Em APKs instalados fora da Play Store, o Android 13 ou superior pode exigir a liberação manual de **Permitir configurações restritas** antes de ativar um serviço de Acessibilidade. No Android 12 e anteriores, o assistente pula esse passo e segue diretamente para Acessibilidade. A própria tela Relógio mostra o estado e conduz o processo: abre `Informações do app` quando necessário, depois leva à Acessibilidade e, ao voltar, revalida o estado automaticamente. O usuário ainda precisa tocar no menu de três pontos e confirmar a opção, pois o Android não fornece API pública para concedê-la automaticamente.
+
+Em alguns aparelhos, a opção **Permitir configurações restritas** pode não aparecer ou responder imediatamente ao abrir as Informações do app. O guia orienta aguardar alguns segundos, tentar o menu novamente e oferece um atalho para reabrir essa tela sem perder o fluxo.
 
 Depois, o app pode abrir diretamente a tela de Acessibilidade. Se a ativação tiver sido iniciada pelo botão principal do overlay, o app verifica o novo estado ao voltar e ativa a janela automaticamente quando possível.
 
@@ -112,12 +114,12 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.2.0`
-- `versionCode`: `17`
+- `versionName`: `1.2.1`
+- `versionCode`: `18`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
-A ativação principal agora fica na própria tela Relógio. O botão muda conforme o estado: libera configurações restritas, leva à Acessibilidade e, quando tudo está pronto, ativa ou desativa a janela sobre o jogo. A aba Sobrepor fica focada nas opções avançadas do overlay.
+A ativação principal agora fica na própria tela Relógio. O botão muda conforme o estado: libera configurações restritas quando necessário, leva à Acessibilidade e, quando tudo está pronto, ativa ou desativa a janela sobre o jogo. A aba Sobrepor fica focada nas opções avançadas do overlay.
 
 
 ## Tela inteira e refinamento visual
@@ -129,3 +131,6 @@ A versão 1.1.5 adiciona relógios mundiais dentro da tela Relógio. A seleção
 
 ## Alarmes na versão 1.2.0
 A versão 1.2.0 adiciona uma aba própria de alarmes, com alarmes únicos ou recorrentes, nome opcional, controle de ativação e integração com o agendamento do Android. O app orienta a liberação de alarmes exatos quando necessária e mantém fallback compatível quando essa permissão não está disponível.
+## QA e permissões na versão 1.2.1
+A versão 1.2.1 revisa o fluxo de configuração do overlay. Android 13+ mantém o passo de configurações restritas quando necessário, com instruções de recuperação caso a opção demore a aparecer. Android 12 e anteriores seguem diretamente para Acessibilidade, evitando um passo inexistente nessas versões.
+

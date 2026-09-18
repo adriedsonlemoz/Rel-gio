@@ -9,10 +9,11 @@ enum class SetupPhase {
 object SetupFlowResolver {
     fun resolve(
         accessibilityEnabled: Boolean,
+        restrictedSettingsRequired: Boolean,
         restrictedSettingsConfirmed: Boolean
     ): SetupPhase = when {
         accessibilityEnabled -> SetupPhase.READY
-        restrictedSettingsConfirmed -> SetupPhase.ACCESSIBILITY
-        else -> SetupPhase.RESTRICTED_SETTINGS
+        restrictedSettingsRequired && !restrictedSettingsConfirmed -> SetupPhase.RESTRICTED_SETTINGS
+        else -> SetupPhase.ACCESSIBILITY
     }
 }

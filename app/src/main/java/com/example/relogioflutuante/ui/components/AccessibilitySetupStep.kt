@@ -21,6 +21,7 @@ import com.example.relogioflutuante.ui.theme.AppColors
 
 @Composable
 fun AccessibilitySetupStep(
+    showRestrictedSettingsReview: Boolean,
     onOpenAccessibility: () -> Unit,
     onReviewStepOne: () -> Unit
 ) {
@@ -30,7 +31,11 @@ fun AccessibilitySetupStep(
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("Passo 2 de 2", color = AppColors.AccentSoft, fontWeight = FontWeight.Bold)
+            Text(
+                if (showRestrictedSettingsReview) "Passo 2 de 2" else "Ativação",
+                color = AppColors.AccentSoft,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(Modifier.height(5.dp))
             Text(
                 "Ativar relógio sobre os apps",
@@ -51,11 +56,13 @@ fun AccessibilitySetupStep(
                 onClick = onOpenAccessibility,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
             ) { Text("Abrir Acessibilidade") }
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onReviewStepOne
-            ) { Text("Rever passo 1") }
+            if (showRestrictedSettingsReview) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onReviewStepOne
+                ) { Text("Acessibilidade bloqueada? Rever passo 1") }
+            }
             Spacer(Modifier.height(7.dp))
             Text(
                 "Ao voltar, o aplicativo verifica automaticamente se foi ativado.",

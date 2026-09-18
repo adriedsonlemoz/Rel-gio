@@ -5,10 +5,15 @@ import org.junit.Test
 
 class ClockOverlayActionResolverTest {
     @Test
-    fun startsByOpeningRestrictedSettingsWhenNoOverlayMethodIsReady() {
+    fun android13PlusStartsByOpeningRestrictedSettings() {
+        assertEquals(ClockOverlayAction.OPEN_RESTRICTED_SETTINGS, resolve())
+    }
+
+    @Test
+    fun android12AndEarlierSkipRestrictedSettings() {
         assertEquals(
-            ClockOverlayAction.OPEN_RESTRICTED_SETTINGS,
-            resolve()
+            ClockOverlayAction.OPEN_ACCESSIBILITY,
+            resolve(restrictedSettingsRequired = false)
         )
     }
 
@@ -51,12 +56,14 @@ class ClockOverlayActionResolverTest {
     private fun resolve(
         canDrawOverlays: Boolean = false,
         accessibilityEnabled: Boolean = false,
+        restrictedSettingsRequired: Boolean = true,
         restrictedSettingsConfirmed: Boolean = false,
         restrictedSettingsOpened: Boolean = false,
         floatingOverlayEnabled: Boolean = false
     ) = ClockOverlayActionResolver.resolve(
         canDrawOverlays = canDrawOverlays,
         accessibilityEnabled = accessibilityEnabled,
+        restrictedSettingsRequired = restrictedSettingsRequired,
         restrictedSettingsConfirmed = restrictedSettingsConfirmed,
         restrictedSettingsOpened = restrictedSettingsOpened,
         floatingOverlayEnabled = floatingOverlayEnabled

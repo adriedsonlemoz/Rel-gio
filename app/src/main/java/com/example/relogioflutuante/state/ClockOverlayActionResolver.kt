@@ -12,12 +12,14 @@ object ClockOverlayActionResolver {
     fun resolve(
         canDrawOverlays: Boolean,
         accessibilityEnabled: Boolean,
+        restrictedSettingsRequired: Boolean,
         restrictedSettingsConfirmed: Boolean,
         restrictedSettingsOpened: Boolean,
         floatingOverlayEnabled: Boolean
     ): ClockOverlayAction = when {
         floatingOverlayEnabled -> ClockOverlayAction.ACTIVE
         canDrawOverlays || accessibilityEnabled -> ClockOverlayAction.ACTIVATE_OVERLAY
+        !restrictedSettingsRequired -> ClockOverlayAction.OPEN_ACCESSIBILITY
         restrictedSettingsConfirmed -> ClockOverlayAction.OPEN_ACCESSIBILITY
         restrictedSettingsOpened -> ClockOverlayAction.CONFIRM_RESTRICTED_SETTINGS
         else -> ClockOverlayAction.OPEN_RESTRICTED_SETTINGS
