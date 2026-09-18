@@ -21,7 +21,12 @@ import com.example.relogioflutuante.ui.components.ClockTimeActions
 import com.example.relogioflutuante.ui.components.InfoCard
 import com.example.relogioflutuante.ui.components.TimeAdjustDialog
 import com.example.relogioflutuante.ui.components.TimeCard
+import com.example.relogioflutuante.ui.components.timezones.WorldClocksCard
+import com.example.relogioflutuante.ui.dialogs.timezones.WorldClockPickerDialog
+import com.example.relogioflutuante.ui.state.rememberWorldClockUiState
 import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.ZoneId
 
 @Composable
 fun ClockScreen(
@@ -33,6 +38,7 @@ fun ClockScreen(
     var showAdjust by remember { mutableStateOf(false) }
     var refreshKey by remember { mutableIntStateOf(0) }
     var overlayRefresh by remember { mutableIntStateOf(0) }
+    val worldClocks = rememberWorldClockUiState(context)
 
     val isSystemTime = remember(refreshKey) { ClockState.offsetMillis(context) == 0L }
     val capability = controller.capability
@@ -101,8 +107,26 @@ fun ClockScreen(
             }
         )
 
+        WorldClocksCard(
+            entries = worldClocks.entries,
+            instant = Instant.ofEpochMilli(System.currentTimeMillis()),
+            localZone = ZoneId.systemDefault(),
+            onAdd = worldClocks::openPicker,
+            onRemove = worldClocks::remove,
+            onMoveUp = worldClocks::moveUp,
+            onMoveDown = worldClocks::moveDown
+        )
+
         InfoCard(
             "O ajuste não altera o relógio do Android. Ele muda apenas a hora exibida pelo app e pelo relógio flutuante."
+        )
+    }
+
+    if (worldClocks.showPicker) {
+        WorldClockPickerDialog(
+            selectedZoneIds = worldClocks.zoneIds.toSet(),
+            onAdd = worldClocks::add,
+            onDismiss = worldClocks::closePicker
         )
     }
 

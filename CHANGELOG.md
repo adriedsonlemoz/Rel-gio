@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.5
+
+- Adicionada seção de **Fusos horários** diretamente na tela Relógio, sem criar uma nova aba na navegação principal.
+- Adicionado botão `+ Adicionar` com catálogo interno pesquisável de cidades e fusos comuns do Brasil e do mundo.
+- Fusos adicionados são persistidos localmente e permanecem após fechar ou reiniciar o aplicativo.
+- Cada fuso mostra hora com segundos, deslocamento UTC e diferença atual em relação ao fuso local, respeitando horário de verão pelas regras de `ZoneId`.
+- A lista indica quando a cidade está em `ontem` ou `amanhã` em relação à data local.
+- Adicionados controles para remover e reordenar fusos salvos sem transformar a tela em um componente monolítico.
+- A seleção e ordenação foram isoladas em `WorldClockRepository`, `WorldClockListRules` e `WorldClockUiState`.
+- Interface dividida em `WorldClocksCard`, `WorldClockRow`, `WorldClockPickerDialog` e `WorldClockPickerRow`.
+- Adicionado catálogo com identificadores IANA válidos, permitindo pesquisa por cidade, país ou `ZoneId`.
+- Adicionados testes unitários para validade/unicidade do catálogo, pesquisa, adição sem duplicatas, remoção, reordenação e cálculos de UTC/diferença de horário.
+- Fusos mundiais usam o instante real do aparelho; o ajuste manual do relógio principal continua restrito ao relógio do app/overlay.
+- Mantida a regra do workflow que bloqueia arquivos Kotlin acima de 250 linhas.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.1.4
 
 - Aplicativo transformado em modo tela inteira/imersivo, com barras de status e navegação ocultas durante o uso.

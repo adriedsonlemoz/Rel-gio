@@ -20,6 +20,8 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Reavaliação automática de permissões ao voltar das Configurações do Android.
 - Interface em tela inteira/imersiva, com barras do sistema ocultas e reaparecimento temporário por gesto.
 - Layout edge-to-edge com proteção para recortes/notches e largura responsiva.
+- Fusos horários salvos na própria tela Relógio, com catálogo pesquisável de cidades, reordenação e remoção.
+- Cada fuso mostra `HH:mm:ss`, UTC, diferença para o fuso local e mudança de dia quando aplicável.
 
 ## Primeiro uso e permissões
 
@@ -28,6 +30,12 @@ Em APKs instalados fora da Play Store, algumas versões do Android exigem libera
 Depois, o app pode abrir diretamente a tela de Acessibilidade. Se a ativação tiver sido iniciada pelo botão principal do overlay, o app verifica o novo estado ao voltar e ativa a janela automaticamente quando possível.
 
 A tela de sobreposição normal também pode ser aberta pelo app. Em alguns Androids, o sistema pode exibir a lista geral de aplicativos em vez da página específica.
+
+## Fusos horários
+
+Na tela Relógio, `+ Adicionar` abre uma lista pronta de cidades e fusos. É possível pesquisar por cidade, país ou identificador IANA, adicionar vários horários, remover e reordenar a lista. Os fusos usam `ZoneId`, portanto acompanham automaticamente regras de horário de verão quando existentes.
+
+Os fusos mundiais usam o instante real fornecido pelo Android. O ajuste manual do relógio principal não altera os fusos internacionais; ele continua afetando apenas o horário principal do aplicativo e o overlay.
 
 ## Overlay para jogo
 
@@ -54,7 +62,10 @@ O projeto inclui testes unitários para:
 - formatos do overlay;
 - escolha do método preferencial de sobreposição;
 - fluxo do botão de ativação direta na tela Relógio;
-- regras responsivas de largura, padding e tamanho do relógio.
+- regras responsivas de largura, padding e tamanho do relógio;
+- validade e pesquisa do catálogo de fusos;
+- adição, remoção e reordenação dos fusos;
+- cálculo de offsets UTC e diferença relativa entre zonas.
 
 O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow também impede arquivos Kotlin com mais de **250 linhas**, ajudando a evitar componentes e classes monolíticas.
 
@@ -66,6 +77,9 @@ O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow tamb�
 - `ui/theme/`: tema e paleta.
 - `ui/layout/`: regras responsivas testáveis para diferentes larguras de tela.
 - `state/`: estados persistentes, aparência, posição e cálculos.
+- `timezones/`: catálogo, persistência, regras da lista e cálculos de fusos horários.
+- `ui/components/timezones/`: componentes pequenos da lista de fusos.
+- `ui/dialogs/timezones/`: seletor pesquisável de cidades.
 - `overlay/`: serviços, janela, estilo, arraste, formatação e notificações.
 - `app/src/test/`: testes unitários.
 - `MainActivity.kt`: ponto de entrada e atualização de estado ao retornar das Configurações.
@@ -83,8 +97,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.1.4`
-- `versionCode`: `15`
+- `versionName`: `1.1.5`
+- `versionCode`: `16`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
@@ -93,3 +107,6 @@ A ativação principal agora fica na própria tela Relógio. O botão muda confo
 
 ## Tela inteira e refinamento visual
 A interface principal agora usa modo imersivo edge-to-edge. As barras do Android ficam ocultas durante o uso e podem aparecer temporariamente por gesto. O conteúdo respeita recortes de tela, a navegação inferior foi compactada e as telas usam espaçamento unificado. Relógio e Contagem começam no topo em vez de centralizar conteúdo com grandes áreas vazias.
+
+## Fusos horários salvos
+A versão 1.1.5 adiciona relógios mundiais dentro da tela Relógio. A seleção fica salva localmente e pode ser reorganizada com os controles de posição, sem criar uma nova aba na navegação inferior.
