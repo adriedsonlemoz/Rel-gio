@@ -11,8 +11,8 @@ android {
         applicationId = "com.example.relogioflutuante"
         minSdk = 26
         targetSdk = 36
-        versionCode = 26
-        versionName = "1.7.0"
+        versionCode = 27
+        versionName = "1.7.1"
     }
 
     buildFeatures {

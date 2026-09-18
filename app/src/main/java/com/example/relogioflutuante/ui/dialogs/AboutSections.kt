@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,6 +26,7 @@ internal data class ChangeLogItem(
 )
 
 internal val recentChanges = listOf(
+    ChangeLogItem("1.7.0", "Alarmes organizados", "Ordenação por próximo disparo e restauração manual dos presets Zyrvorthian."),
     ChangeLogItem("1.6.0", "Sobre e diagnóstico", "Histórico visual, diagnóstico copiável e correção do preset Corvith."),
     ChangeLogItem("1.5.0", "Alarmes mais completos", "Soneca, som e vibração configuráveis individualmente por alarme."),
     ChangeLogItem("1.4.0", "Presets e acesso rápido", "Presets do overlay, bloco nas Configurações Rápidas e alarmes Zyrvorthian."),

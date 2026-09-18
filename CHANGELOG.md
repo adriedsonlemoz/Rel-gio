@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.1
+
+- Corrigido erro de compilação no GitHub Actions causado pelo import explícito de `androidx.compose.foundation.layout.weight` em `AboutDialog.kt` e `AboutSections.kt`.
+- `weight` agora é resolvido corretamente pelos escopos de `Column` e `Row`, compatível com a versão atual do Jetpack Compose.
+- Histórico visual da tela `Sobre` atualizado para incluir as mudanças da versão 1.7.0.
+- Mantidas a ordenação de alarmes, restauração manual de presets e os horários Zyrvorthian de Brasília.
+- Atualizados metadados para `versionName 1.7.1` e `versionCode 27`.
+
 ## 1.7.0
 
 - Alarmes ativos agora são ordenados automaticamente pelo próximo disparo real, respeitando o fuso individual de cada alarme.

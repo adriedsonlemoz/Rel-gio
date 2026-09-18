@@ -126,8 +126,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.7.0`
-- `versionCode`: `26`
+- `versionName`: `1.7.1`
+- `versionCode`: `27`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
