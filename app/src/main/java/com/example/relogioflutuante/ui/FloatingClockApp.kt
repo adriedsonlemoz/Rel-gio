@@ -3,11 +3,11 @@ package com.example.relogioflutuante.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,6 +25,8 @@ import com.example.relogioflutuante.ui.components.AppHeader
 import com.example.relogioflutuante.ui.components.MainBottomNavigation
 import com.example.relogioflutuante.ui.components.MainSection
 import com.example.relogioflutuante.ui.dialogs.AboutDialog
+import com.example.relogioflutuante.ui.layout.ScreenLayoutRules
+import com.example.relogioflutuante.ui.layout.ScreenWidthClass
 import com.example.relogioflutuante.ui.screens.ClockScreen
 import com.example.relogioflutuante.ui.screens.CountdownScreen
 import com.example.relogioflutuante.ui.screens.OverlayScreen
@@ -45,8 +47,7 @@ fun FloatingClockApp(permissionRefresh: Int) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppColors.Background)
-                .statusBarsPadding()
-                .navigationBarsPadding()
+                .displayCutoutPadding()
         ) {
             SetupScreen(
                 permissionRefresh = permissionRefresh,
@@ -67,9 +68,9 @@ fun FloatingClockApp(permissionRefresh: Int) {
         modifier = Modifier
             .fillMaxSize()
             .background(AppColors.Background)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+            .displayCutoutPadding(),
         containerColor = AppColors.Background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             AppHeader(
                 onOpenSetup = {
@@ -111,15 +112,22 @@ private fun ResponsiveContent(
     content: @Composable () -> Unit
 ) {
     BoxWithConstraints(modifier.fillMaxSize()) {
-        val wide = maxWidth >= 700.dp
-        val horizontal = if (wide) 48.dp else 18.dp
+        val widthDp = maxWidth.value.toInt()
+        val widthClass = ScreenLayoutRules.widthClass(widthDp)
+        val horizontal = ScreenLayoutRules.horizontalPaddingDp(widthDp).dp
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = horizontal),
             contentAlignment = Alignment.TopCenter
         ) {
-            Box(modifier = if (wide) Modifier.width(680.dp) else Modifier.fillMaxWidth()) {
+            Box(
+                modifier = if (widthClass == ScreenWidthClass.WIDE) {
+                    Modifier.width(700.dp)
+                } else {
+                    Modifier.fillMaxWidth()
+                }
+            ) {
                 content()
             }
         }

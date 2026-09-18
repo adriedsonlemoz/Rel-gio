@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.4
+
+- Aplicativo transformado em modo tela inteira/imersivo, com barras de status e navegação ocultas durante o uso.
+- Barras do sistema podem reaparecer temporariamente por gesto e são ocultadas novamente ao retornar o foco ao app.
+- Adicionado suporte edge-to-edge com uso das áreas próximas às bordas e proteção para recortes/notches.
+- Removidos paddings fixos de status/navigation bars que deixavam áreas mortas na interface.
+- Tela Relógio deixa de centralizar verticalmente o conteúdo e passa a começar no topo, reduzindo o grande espaço vazio percebido.
+- Relógio, Contagem, Sobrepor e Configuração passam a compartilhar `AppScreenColumn` para espaçamento e rolagem consistentes.
+- Card principal de tempo recebeu acabamento mais compacto, cantos maiores, borda sutil e hierarquia tipográfica refinada.
+- Navegação inferior foi compactada e passou a dividir igualmente a largura entre as três áreas, sem animações pesadas.
+- Cabeçalho ficou mais compacto para aproveitar melhor a tela cheia.
+- Ações de horário foram extraídas para `ClockTimeActions`; ações de contagem e diálogo de tempo esgotado também foram separados para evitar crescimento das telas.
+- Capacidade de overlay agora é lida uma vez por `permissionRefresh` no controlador e compartilhada entre Relógio, Sobrepor e Configuração, reduzindo consultas repetidas ao sistema durante a navegação.
+- Adicionado `ScreenLayoutRules` com teste unitário para larguras compacta, normal e ampla, incluindo padding e tamanho do relógio.
+- Mantida a regra de nenhum arquivo Kotlin ultrapassar 250 linhas.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.1.3
 
 - Adicionado botão de ativação do relógio flutuante diretamente na tela Relógio.

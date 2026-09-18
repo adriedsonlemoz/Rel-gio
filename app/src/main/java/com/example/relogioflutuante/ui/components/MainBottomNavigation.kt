@@ -3,7 +3,6 @@ package com.example.relogioflutuante.ui.components
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,37 +34,40 @@ fun MainBottomNavigation(
     section: MainSection,
     onSectionChange: (MainSection) -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(AppColors.Surface)
-            .padding(horizontal = 10.dp, vertical = 7.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        MainSection.entries.forEach { item ->
-            NavigationItem(
-                item = item,
-                selected = section == item,
-                onClick = { if (section != item) onSectionChange(item) }
-            )
+    Surface(color = AppColors.Surface) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 7.dp)
+        ) {
+            MainSection.entries.forEach { item ->
+                NavigationItem(
+                    modifier = Modifier.weight(1f),
+                    item = item,
+                    selected = section == item,
+                    onClick = { if (section != item) onSectionChange(item) }
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun NavigationItem(
+    modifier: Modifier,
     item: MainSection,
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val background = if (selected) AppColors.Accent.copy(alpha = 0.20f) else AppColors.Surface
+    val background = if (selected) AppColors.Accent.copy(alpha = 0.18f) else AppColors.Surface
     val contentColor = if (selected) AppColors.AccentSoft else AppColors.TextSecondary
     Column(
-        modifier = Modifier
+        modifier = modifier
+            .padding(horizontal = 3.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(background)
             .clickable(onClick = onClick)
-            .padding(horizontal = 24.dp, vertical = 7.dp),
+            .padding(vertical = 7.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(

@@ -4,29 +4,20 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.example.relogioflutuante.overlay.OverlayCapabilityDetector
 import com.example.relogioflutuante.overlay.OverlayService
 import com.example.relogioflutuante.state.OverlayAppearanceState
 import com.example.relogioflutuante.state.OverlayPresentation
 import com.example.relogioflutuante.state.OverlayState
 import com.example.relogioflutuante.ui.OverlayActivationController
+import com.example.relogioflutuante.ui.components.AppScreenColumn
 import com.example.relogioflutuante.ui.components.InfoCard
 import com.example.relogioflutuante.ui.components.OverlayAppearanceCard
 import com.example.relogioflutuante.ui.components.OverlayMethodOptionsCard
@@ -44,10 +35,13 @@ fun OverlayScreen(
     onOpenSetup: () -> Unit
 ) {
     val context = LocalContext.current
-    val capability = remember(controller.permissionRefresh) { OverlayCapabilityDetector.read(context) }
+    val capability = controller.capability
     val notificationsAllowed = remember(controller.permissionRefresh) {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
     }
     var mode by remember { mutableStateOf(OverlayState.mode(context)) }
     var appearance by remember { mutableStateOf(OverlayAppearanceState.read(context)) }
@@ -63,12 +57,7 @@ fun OverlayScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(top = 12.dp, bottom = 20.dp)
-    ) {
+    AppScreenColumn {
         OverlayPrimaryStatusCard(
             capability = capability,
             enabled = runtimeState.enabled,
@@ -86,7 +75,6 @@ fun OverlayScreen(
             }
         )
 
-        Spacer(Modifier.height(10.dp))
         OverlayAppearanceCard(
             appearance = appearance,
             onFormatChange = {
@@ -108,7 +96,6 @@ fun OverlayScreen(
         )
 
         if (ready) {
-            Spacer(Modifier.height(10.dp))
             OverlayMethodOptionsCard(
                 capability = capability,
                 notificationsAllowed = notificationsAllowed,
@@ -118,7 +105,6 @@ fun OverlayScreen(
             )
         }
 
-        Spacer(Modifier.height(10.dp))
         InfoCard(
             when {
                 !ready -> "Primeiro toque em “Configurar em 2 passos”. Depois disso, ativar a janela passa a ser um único toque."

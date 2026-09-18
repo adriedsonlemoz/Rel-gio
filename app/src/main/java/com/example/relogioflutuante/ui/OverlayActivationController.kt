@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import com.example.relogioflutuante.overlay.OverlayCapability
 import com.example.relogioflutuante.overlay.OverlayCapabilityDetector
 import com.example.relogioflutuante.overlay.OverlayService
 import com.example.relogioflutuante.overlay.OverlayStrategyResolver
@@ -22,6 +23,7 @@ import com.example.relogioflutuante.state.OverlayState
 
 data class OverlayActivationController(
     val permissionRefresh: Int,
+    val capability: OverlayCapability,
     val enableRecommendedOverlay: () -> Unit,
     val enableSystemOverlay: () -> Unit,
     val enableAccessibilityOverlay: () -> Unit,
@@ -38,6 +40,7 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
     val context = LocalContext.current
     val navigator = remember(context) { SettingsNavigator(context) }
     var pendingActivation by remember { mutableStateOf<OverlayPresentation?>(null) }
+    val capability = remember(permissionRefresh) { OverlayCapabilityDetector.read(context) }
 
     fun startForegroundPresentation(presentation: OverlayPresentation) {
         OverlayState.setPresentation(context, presentation)
@@ -69,7 +72,7 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
     }
 
     fun enableSystemOverlay() {
-        if (OverlayCapabilityDetector.read(context).canDrawOverlays) {
+        if (capability.canDrawOverlays) {
             pendingActivation = null
             startForegroundPresentation(OverlayPresentation.SYSTEM_OVERLAY)
         } else {
@@ -79,7 +82,7 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
     }
 
     fun enableAccessibilityOverlay() {
-        if (OverlayCapabilityDetector.isAccessibilityServiceEnabled(context)) {
+        if (capability.accessibilityServiceEnabled) {
             pendingActivation = null
             activateAccessibilityOverlay()
         } else {
@@ -111,13 +114,13 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
     LaunchedEffect(permissionRefresh, pendingActivation) {
         when (pendingActivation) {
             OverlayPresentation.SYSTEM_OVERLAY -> {
-                if (OverlayCapabilityDetector.read(context).canDrawOverlays) {
+                if (capability.canDrawOverlays) {
                     pendingActivation = null
                     startForegroundPresentation(OverlayPresentation.SYSTEM_OVERLAY)
                 }
             }
             OverlayPresentation.ACCESSIBILITY_OVERLAY -> {
-                if (OverlayCapabilityDetector.isAccessibilityServiceEnabled(context)) {
+                if (capability.accessibilityServiceEnabled) {
                     pendingActivation = null
                     activateAccessibilityOverlay()
                 }
@@ -127,7 +130,6 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
     }
 
     fun enableRecommended() {
-        val capability = OverlayCapabilityDetector.read(context)
         when (OverlayStrategyResolver.recommended(capability)) {
             OverlayPresentation.SYSTEM_OVERLAY -> enableSystemOverlay()
             OverlayPresentation.ACCESSIBILITY_OVERLAY -> enableAccessibilityOverlay()
@@ -137,6 +139,7 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
 
     return OverlayActivationController(
         permissionRefresh = permissionRefresh,
+        capability = capability,
         enableRecommendedOverlay = ::enableRecommended,
         enableSystemOverlay = ::enableSystemOverlay,
         enableAccessibilityOverlay = ::enableAccessibilityOverlay,

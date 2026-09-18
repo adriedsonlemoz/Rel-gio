@@ -1,5 +1,6 @@
 package com.example.relogioflutuante.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,36 +19,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.relogioflutuante.ui.layout.ScreenLayoutRules
 import com.example.relogioflutuante.ui.theme.AppColors
 
 @Composable
 fun TimeCard(title: String, time: String, subtitle: String) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val timeSize = when {
-        screenWidth < 350 -> 38.sp
-        screenWidth < 500 -> 48.sp
-        else -> 58.sp
-    }
+    val timeSize = ScreenLayoutRules.timeTextSizeSp(screenWidth).sp
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceStrong),
-        shape = RoundedCornerShape(18.dp)
+        border = BorderStroke(1.dp, AppColors.AccentSoft.copy(alpha = 0.10f)),
+        shape = RoundedCornerShape(22.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 19.dp),
+                .padding(horizontal = 16.dp, vertical = 17.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = title,
                 color = AppColors.AccentSoft,
-                fontSize = 11.sp,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 1.4.sp
+                letterSpacing = 1.5.sp
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(5.dp))
             Text(
                 text = time,
                 color = AppColors.TextPrimary,
@@ -57,7 +56,7 @@ fun TimeCard(title: String, time: String, subtitle: String) {
                 textAlign = TextAlign.Center,
                 maxLines = 1
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = subtitle,
                 color = AppColors.TextSecondary,

@@ -18,6 +18,8 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Ativação direta pela tela Relógio, sem precisar entrar primeiro na aba Sobrepor.
 - Guia completo de configuração disponível pelo menu para permissões e restrições de APK instalado fora da Play Store.
 - Reavaliação automática de permissões ao voltar das Configurações do Android.
+- Interface em tela inteira/imersiva, com barras do sistema ocultas e reaparecimento temporário por gesto.
+- Layout edge-to-edge com proteção para recortes/notches e largura responsiva.
 
 ## Primeiro uso e permissões
 
@@ -39,7 +41,7 @@ Quando a posição está desbloqueada, a janela pode ser arrastada e fechada. De
 
 ## Desempenho
 
-Relógio, contagem e overlays atualizam apenas na virada do segundo. O serviço evita redesenhar conteúdo que não mudou. A aparência do overlay é aplicada somente quando uma configuração é alterada. O serviço de Acessibilidade deixa de manter ticker ativo quando a janela está desativada e acorda por mudanças nas preferências.
+Relógio, contagem e overlays atualizam apenas na virada do segundo. O serviço evita redesenhar conteúdo que não mudou. A aparência do overlay é aplicada somente quando uma configuração é alterada. O serviço de Acessibilidade deixa de manter ticker ativo quando a janela está desativada e acorda por mudanças nas preferências. A capacidade de sobreposição é lida uma única vez por ciclo de retorno das Configurações e compartilhada entre as telas, reduzindo consultas repetidas ao sistema durante a troca de abas.
 
 ## Testes
 
@@ -51,7 +53,8 @@ O projeto inclui testes unitários para:
 - formatação da duração;
 - formatos do overlay;
 - escolha do método preferencial de sobreposição;
-- fluxo do botão de ativação direta na tela Relógio.
+- fluxo do botão de ativação direta na tela Relógio;
+- regras responsivas de largura, padding e tamanho do relógio.
 
 O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow também impede arquivos Kotlin com mais de **250 linhas**, ajudando a evitar componentes e classes monolíticas.
 
@@ -61,6 +64,7 @@ O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow tamb�
 - `ui/components/`: componentes pequenos e reutilizáveis.
 - `ui/dialogs/`: diálogo Sobre.
 - `ui/theme/`: tema e paleta.
+- `ui/layout/`: regras responsivas testáveis para diferentes larguras de tela.
 - `state/`: estados persistentes, aparência, posição e cálculos.
 - `overlay/`: serviços, janela, estilo, arraste, formatação e notificações.
 - `app/src/test/`: testes unitários.
@@ -79,9 +83,13 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.1.3`
-- `versionCode`: `14`
+- `versionName`: `1.1.4`
+- `versionCode`: `15`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
 A ativação principal agora fica na própria tela Relógio. O botão muda conforme o estado: libera configurações restritas, leva à Acessibilidade e, quando tudo está pronto, ativa ou desativa a janela sobre o jogo. A aba Sobrepor fica focada nas opções avançadas do overlay.
+
+
+## Tela inteira e refinamento visual
+A interface principal agora usa modo imersivo edge-to-edge. As barras do Android ficam ocultas durante o uso e podem aparecer temporariamente por gesto. O conteúdo respeita recortes de tela, a navegação inferior foi compactada e as telas usam espaçamento unificado. Relógio e Contagem começam no topo em vez de centralizar conteúdo com grandes áreas vazias.

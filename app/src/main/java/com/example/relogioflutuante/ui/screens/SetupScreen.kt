@@ -2,12 +2,6 @@ package com.example.relogioflutuante.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -21,12 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.R
-import com.example.relogioflutuante.overlay.OverlayCapabilityDetector
 import com.example.relogioflutuante.state.SetupFlowResolver
 import com.example.relogioflutuante.state.SetupGuideState
 import com.example.relogioflutuante.state.SetupPhase
 import com.example.relogioflutuante.ui.OverlayActivationController
 import com.example.relogioflutuante.ui.components.AccessibilitySetupStep
+import com.example.relogioflutuante.ui.components.AppScreenColumn
 import com.example.relogioflutuante.ui.components.InfoCard
 import com.example.relogioflutuante.ui.components.RestrictedSettingsStep
 import com.example.relogioflutuante.ui.components.SetupReadyCard
@@ -41,7 +35,7 @@ fun SetupScreen(
     onFinish: () -> Unit
 ) {
     val context = LocalContext.current
-    val capability = remember(permissionRefresh) { OverlayCapabilityDetector.read(context) }
+    val capability = controller.capability
     val restrictedConfirmed = remember(permissionRefresh) {
         SetupGuideState.isRestrictedSettingsConfirmed(context)
     }
@@ -50,14 +44,12 @@ fun SetupScreen(
         restrictedSettingsConfirmed = restrictedConfirmed
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 18.dp, vertical = 12.dp)
+    AppScreenColumn(
+        modifier = Modifier,
+        horizontalPadding = 18.dp,
+        horizontalAlignment = Alignment.Start
     ) {
         SetupHeader(showBack = showBack, onBack = onBack)
-        Spacer(Modifier.height(16.dp))
 
         when (phase) {
             SetupPhase.RESTRICTED_SETTINGS -> RestrictedSettingsStep(
@@ -82,7 +74,6 @@ fun SetupScreen(
             )
         }
 
-        Spacer(Modifier.height(12.dp))
         InfoCard(
             when (phase) {
                 SetupPhase.RESTRICTED_SETTINGS -> "Essa liberação é exigida pelo Android para APKs instalados fora da Play Store."
@@ -90,7 +81,6 @@ fun SetupScreen(
                 SetupPhase.READY -> "Depois de concluído, essa configuração fica salva. Você só volta aqui se quiser trocar o método."
             }
         )
-        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -110,13 +100,13 @@ private fun SetupHeader(showBack: Boolean, onBack: () -> Unit) {
             Text(
                 "Ativar relógio flutuante",
                 color = AppColors.TextPrimary,
-                fontSize = 24.sp,
+                fontSize = 23.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 "São apenas dois passos na primeira configuração.",
                 color = AppColors.TextSecondary,
-                fontSize = 13.sp
+                fontSize = 12.sp
             )
         }
     }

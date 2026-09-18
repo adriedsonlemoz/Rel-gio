@@ -32,20 +32,20 @@ fun AppHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+            .padding(start = 18.dp, end = 6.dp, top = 12.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
             Text(
                 text = "Relógio Flutuante",
                 color = AppColors.TextPrimary,
-                fontSize = 22.sp,
+                fontSize = 21.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = "Hora, contagem e modo sobreposto",
                 color = AppColors.TextSecondary,
-                fontSize = 12.sp
+                fontSize = 11.sp
             )
         }
         IconButton(onClick = { expanded = true }) {
