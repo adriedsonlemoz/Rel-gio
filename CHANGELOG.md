@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.2 (13)
+- Simplifica a ativação para um assistente objetivo de dois passos: configurações restritas e Acessibilidade.
+- Após a Acessibilidade ser detectada, oferece um único botão para ativar a janela e concluir.
+- No passo de Acessibilidade, permite voltar às Informações do app caso a configuração restrita ainda não tenha sido liberada.
+- A tela Sobrepor deixa de exibir métodos alternativos antes da configuração principal estar pronta.
+- O botão principal passa a usar textos diretos: “Configurar em 2 passos” e “Ativar relógio sobre o jogo”.
+- Substitui a NavigationBar animada por navegação inferior leve e imediata, reduzindo a sensação de atraso entre telas.
+- Evita atualizar o estado visual do overlay quando o valor lido não mudou.
+- Mantém estado da aba com rememberSaveable.
+- Adiciona testes unitários para a resolução das etapas do assistente de ativação.
+- Mantém a regra de arquivos Kotlin abaixo de 250 linhas.
+
 ## 1.1.1 - 2026-09-17
 
 - Corrigido erro de compilação Kotlin em `CountdownScreen.kt` detectado antes da execução dos testes unitários.

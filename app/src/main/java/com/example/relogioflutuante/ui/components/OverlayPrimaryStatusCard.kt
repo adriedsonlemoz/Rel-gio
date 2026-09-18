@@ -30,18 +30,17 @@ fun OverlayPrimaryStatusCard(
     mode: OverlayMode,
     onModeChange: (OverlayMode) -> Unit,
     onEnableRecommended: () -> Unit,
+    onOpenSetup: () -> Unit,
     onDisable: () -> Unit
 ) {
-    val activeText = when (presentation) {
-        OverlayPresentation.ACCESSIBILITY_OVERLAY -> "Janela ativa via Acessibilidade"
-        OverlayPresentation.SYSTEM_OVERLAY -> "Janela normal ativa"
-        OverlayPresentation.NOTIFICATION -> "Modo por notificação ativo"
-    }
-    val readyText = when {
-        capability.canDrawOverlays -> "Sobreposição normal pronta"
-        capability.accessibilityServiceEnabled -> "Acessibilidade pronta"
-        capability.isLowRamDevice -> "Acessibilidade necessária"
-        else -> "Configure um método de sobreposição"
+    val ready = capability.canDrawOverlays || capability.accessibilityServiceEnabled
+    val status = when {
+        enabled && presentation == OverlayPresentation.ACCESSIBILITY_OVERLAY -> "Ativa via Acessibilidade"
+        enabled && presentation == OverlayPresentation.SYSTEM_OVERLAY -> "Janela flutuante ativa"
+        enabled -> "Modo por notificação ativo"
+        capability.accessibilityServiceEnabled -> "Pronta para usar"
+        capability.canDrawOverlays -> "Pronta para usar"
+        else -> "Configuração necessária"
     }
 
     Card(
@@ -50,18 +49,11 @@ fun OverlayPrimaryStatusCard(
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(
-                "Sobre outros aplicativos",
-                color = AppColors.TextPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text("Relógio sobre o jogo", color = AppColors.TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text(
-                if (enabled) activeText else readyText,
-                color = if (enabled || capability.canDrawOverlays || capability.accessibilityServiceEnabled) {
-                    AppColors.Success
-                } else AppColors.TextSecondary,
+                status,
+                color = if (ready || enabled) AppColors.Success else AppColors.Warning,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -71,25 +63,21 @@ fun OverlayPrimaryStatusCard(
             OverlayModeSelector(mode, onModeChange)
             Spacer(Modifier.height(16.dp))
 
-            if (enabled) {
-                OutlinedButton(
+            when {
+                enabled -> OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onDisable
                 ) { Text("Desativar janela") }
-            } else {
-                Button(
+                ready -> Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = onEnableRecommended,
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
-                ) {
-                    Text(
-                        when {
-                            capability.canDrawOverlays -> "Ativar janela flutuante"
-                            capability.accessibilityServiceEnabled -> "Ativar via Acessibilidade"
-                            else -> "Configurar Acessibilidade"
-                        }
-                    )
-                }
+                ) { Text("Ativar relógio sobre o jogo") }
+                else -> Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onOpenSetup,
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
+                ) { Text("Configurar em 2 passos") }
             }
         }
     }

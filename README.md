@@ -77,6 +77,9 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.1.1`
+- `versionName`: `1.1.2`
 - `versionCode`: `12`
 - APK: `Relogio-Flutuante.apk`
+
+## Ativação simplificada
+Em instalações por APK, o primeiro uso orienta apenas dois passos: permitir configurações restritas nas Informações do app e ativar o serviço em Acessibilidade. Depois disso, a janela pode ser ativada com um único toque em **Ativar relógio sobre o jogo**.

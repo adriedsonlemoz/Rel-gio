@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +34,7 @@ import com.example.relogioflutuante.ui.theme.AppColors
 @Composable
 fun FloatingClockApp(permissionRefresh: Int) {
     val context = LocalContext.current
-    var section by remember { mutableStateOf(MainSection.CLOCK) }
+    var section by rememberSaveable { mutableStateOf(MainSection.CLOCK) }
     var showAbout by remember { mutableStateOf(false) }
     var showSetup by remember { mutableStateOf(!FirstRunState.isSetupComplete(context)) }
     var setupFromMenu by remember { mutableStateOf(false) }
@@ -86,7 +87,10 @@ fun FloatingClockApp(permissionRefresh: Int) {
             when (section) {
                 MainSection.CLOCK -> ClockScreen()
                 MainSection.COUNTDOWN -> CountdownScreen()
-                MainSection.OVERLAY -> OverlayScreen(overlayActivation)
+                MainSection.OVERLAY -> OverlayScreen(overlayActivation) {
+                    setupFromMenu = true
+                    showSetup = true
+                }
             }
         }
     }
