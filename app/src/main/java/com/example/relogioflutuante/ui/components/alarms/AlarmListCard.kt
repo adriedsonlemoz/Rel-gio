@@ -199,6 +199,7 @@ private fun AlarmRow(
                 fontSize = 11.sp,
                 fontWeight = if (alarm.enabled) FontWeight.SemiBold else FontWeight.Normal
             )
+            AlarmOptionsSummary(alarm)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Switch(

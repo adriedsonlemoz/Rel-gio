@@ -41,8 +41,29 @@ class AlarmScheduler(context: Context) {
         }
     }
 
+
+    fun scheduleSnooze(alarm: Alarm, minutes: Int = alarm.snoozeMinutes) {
+        if (minutes <= 0) return
+        val triggerAt = System.currentTimeMillis() + minutes * 60_000L
+        val operation = snoozeIntent(alarm.id)
+        if (canScheduleExact()) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerAt,
+                operation
+            )
+        } else {
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerAt,
+                operation
+            )
+        }
+    }
+
     fun cancel(id: Long) {
         alarmManager.cancel(fireIntent(id))
+        alarmManager.cancel(snoozeIntent(id))
     }
 
     fun rescheduleAll() {
@@ -62,9 +83,19 @@ class AlarmScheduler(context: Context) {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
+    private fun snoozeIntent(id: Long): PendingIntent = PendingIntent.getBroadcast(
+        appContext,
+        requestCode(id) xor SNOOZE_REQUEST_MASK,
+        Intent(appContext, AlarmReceiver::class.java)
+            .setAction(AlarmReceiver.ACTION_SNOOZE_FIRE)
+            .putExtra(AlarmReceiver.EXTRA_ALARM_ID, id),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
     private fun requestCode(id: Long): Int = (id xor (id ushr 32)).toInt()
 
     private companion object {
         const val SHOW_REQUEST_CODE = 71_001
+        const val SNOOZE_REQUEST_MASK = 0x5A5A0000
     }
 }

@@ -28,39 +28,28 @@ class AlarmNotificationManager(private val context: Context) {
             enableVibration(false)
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
-        val fallbackChannel = NotificationChannel(
-            FALLBACK_CHANNEL_ID,
-            "Alertas de alarme",
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Emite o alerta quando o Android impede o toque contínuo."
-            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            val attributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-            setSound(uri, attributes)
-            enableVibration(true)
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        }
-        manager.createNotificationChannels(listOf(ringChannel, fallbackChannel))
+        manager.createNotificationChannel(ringChannel)
     }
 
-    fun buildRinging(alarm: Alarm): Notification = Notification.Builder(context, RING_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_nav_alarm)
-        .setContentTitle(alarmTitle(alarm))
-        .setContentText("Alarme de ${formatTime(alarm)}")
-        .setCategory(Notification.CATEGORY_ALARM)
-        .setVisibility(Notification.VISIBILITY_PUBLIC)
-        .setOngoing(true)
-        .setOnlyAlertOnce(true)
-        .setContentIntent(openAppIntent())
-        .addAction(stopAction())
-        .build()
+    fun buildRinging(alarm: Alarm): Notification {
+        val builder = Notification.Builder(context, RING_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_nav_alarm)
+            .setContentTitle(alarmTitle(alarm))
+            .setContentText("Alarme de ${formatTime(alarm)}")
+            .setCategory(Notification.CATEGORY_ALARM)
+            .setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(openAppIntent())
+        if (alarm.snoozeMinutes > 0) builder.addAction(snoozeAction(alarm))
+        builder.addAction(stopAction(alarm.id))
+        return builder.build()
+    }
 
     fun postFallback(alarm: Alarm) {
         createChannels()
-        val notification = Notification.Builder(context, FALLBACK_CHANNEL_ID)
+        val channelId = ensureFallbackChannel(alarm)
+        val builder = Notification.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_nav_alarm)
             .setContentTitle(alarmTitle(alarm))
             .setContentText("Alarme de ${formatTime(alarm)}")
@@ -68,16 +57,73 @@ class AlarmNotificationManager(private val context: Context) {
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
             .setContentIntent(openAppIntent())
-            .build()
-        manager.notify(FALLBACK_NOTIFICATION_ID + alarm.id.toInt(), notification)
+        if (alarm.snoozeMinutes > 0) builder.addAction(snoozeAction(alarm))
+        builder.addAction(stopAction(alarm.id))
+        manager.notify(fallbackNotificationId(alarm.id), builder.build())
     }
 
-    private fun stopAction(): Notification.Action {
+    fun cancelFallback(alarmId: Long) {
+        if (alarmId < 0) return
+        manager.cancel(fallbackNotificationId(alarmId))
+    }
+
+    private fun ensureFallbackChannel(alarm: Alarm): String {
+        val id = "alarm_fallback_${alarm.sound.storageKey}_${if (alarm.vibrate) 1 else 0}"
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
+        val channel = NotificationChannel(
+            id,
+            "Alertas de alarme",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Emite o alerta quando o Android impede o toque contínuo."
+            val type = ringtoneType(alarm.sound)
+            if (type == null) {
+                setSound(null, null)
+            } else {
+                val uri = RingtoneManager.getDefaultUri(type)
+                val attributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                setSound(uri, attributes)
+            }
+            enableVibration(alarm.vibrate)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        manager.createNotificationChannel(channel)
+        return id
+    }
+
+    private fun ringtoneType(sound: AlarmSound): Int? = when (sound) {
+        AlarmSound.ALARM -> RingtoneManager.TYPE_ALARM
+        AlarmSound.RINGTONE -> RingtoneManager.TYPE_RINGTONE
+        AlarmSound.NOTIFICATION -> RingtoneManager.TYPE_NOTIFICATION
+        AlarmSound.SILENT -> null
+    }
+
+    private fun snoozeAction(alarm: Alarm): Notification.Action {
         val pendingIntent = PendingIntent.getService(
             context,
-            STOP_REQUEST_CODE,
+            actionRequestCode(alarm.id, SNOOZE_REQUEST_SALT),
             Intent(context, AlarmRingingService::class.java)
-                .setAction(AlarmRingingService.ACTION_STOP),
+                .setAction(AlarmRingingService.ACTION_SNOOZE)
+                .putExtra(AlarmRingingService.EXTRA_ALARM_ID, alarm.id),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        return Notification.Action.Builder(
+            android.R.drawable.ic_lock_idle_alarm,
+            "Soneca ${alarm.snoozeMinutes} min",
+            pendingIntent
+        ).build()
+    }
+
+    private fun stopAction(alarmId: Long): Notification.Action {
+        val pendingIntent = PendingIntent.getService(
+            context,
+            actionRequestCode(alarmId, STOP_REQUEST_SALT),
+            Intent(context, AlarmRingingService::class.java)
+                .setAction(AlarmRingingService.ACTION_STOP)
+                .putExtra(AlarmRingingService.EXTRA_ALARM_ID, alarmId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return Notification.Action.Builder(
@@ -103,12 +149,18 @@ class AlarmNotificationManager(private val context: Context) {
         alarm.minute
     )
 
+    private fun actionRequestCode(id: Long, salt: Int): Int =
+        ((id xor (id ushr 32)).toInt()) xor salt
+
+    private fun fallbackNotificationId(id: Long): Int =
+        FALLBACK_NOTIFICATION_BASE + ((id xor (id ushr 32)).toInt() and 0x0FFF)
+
     companion object {
         const val RING_CHANNEL_ID = "alarm_ringing"
         const val SERVICE_NOTIFICATION_ID = 22_100
-        private const val FALLBACK_CHANNEL_ID = "alarm_fallback"
-        private const val FALLBACK_NOTIFICATION_ID = 22_500
-        private const val STOP_REQUEST_CODE = 22_101
+        private const val FALLBACK_NOTIFICATION_BASE = 22_500
+        private const val STOP_REQUEST_SALT = 0x1100
+        private const val SNOOZE_REQUEST_SALT = 0x2200
         private const val OPEN_REQUEST_CODE = 22_102
     }
 }

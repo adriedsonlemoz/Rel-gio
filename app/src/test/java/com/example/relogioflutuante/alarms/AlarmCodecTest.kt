@@ -15,7 +15,10 @@ class AlarmCodecTest {
                 label = "Acordar: café ☕",
                 repeatDays = setOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
                 enabled = true,
-                zoneId = "America/Sao_Paulo"
+                zoneId = "America/Sao_Paulo",
+                sound = AlarmSound.NOTIFICATION,
+                vibrate = false,
+                snoozeMinutes = 15
             ),
             Alarm(id = 9L, hour = 20, minute = 10, enabled = false)
         )
@@ -31,6 +34,16 @@ class AlarmCodecTest {
         assertEquals(1, decoded.size)
         assertEquals(null, decoded.first().zoneId)
         assertEquals("Teste", decoded.first().label)
+    }
+
+
+    @Test
+    fun legacyAlarmGetsDefaultSoundVibrationAndSnooze() {
+        val alarm = AlarmCodec.decode("1:7:30:1:127:VGVzdGU").single()
+
+        assertEquals(AlarmSound.ALARM, alarm.sound)
+        assertEquals(true, alarm.vibrate)
+        assertEquals(5, alarm.snoozeMinutes)
     }
 
     @Test

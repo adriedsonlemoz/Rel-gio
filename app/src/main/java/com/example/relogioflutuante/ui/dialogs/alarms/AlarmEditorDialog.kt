@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -19,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.alarms.Alarm
 import com.example.relogioflutuante.alarms.AlarmFormatting
+import com.example.relogioflutuante.alarms.AlarmSound
 import com.example.relogioflutuante.ui.theme.AppColors
 import java.time.DayOfWeek
 import java.time.LocalTime
@@ -27,19 +31,34 @@ import java.time.LocalTime
 fun AlarmEditorDialog(
     alarm: Alarm?,
     onDismiss: () -> Unit,
-    onConfirm: (hour: Int, minute: Int, label: String, days: Set<DayOfWeek>) -> Unit
+    onConfirm: (
+        hour: Int,
+        minute: Int,
+        label: String,
+        days: Set<DayOfWeek>,
+        sound: AlarmSound,
+        vibrate: Boolean,
+        snoozeMinutes: Int
+    ) -> Unit
 ) {
     val defaultTime = remember { LocalTime.now().plusMinutes(5) }
     var hour by remember(alarm?.id) { mutableIntStateOf(alarm?.hour ?: defaultTime.hour) }
     var minute by remember(alarm?.id) { mutableIntStateOf(alarm?.minute ?: defaultTime.minute) }
     var label by remember(alarm?.id) { mutableStateOf(alarm?.label.orEmpty()) }
     var days by remember(alarm?.id) { mutableStateOf(alarm?.repeatDays.orEmpty()) }
+    var sound by remember(alarm?.id) { mutableStateOf(alarm?.sound ?: AlarmSound.ALARM) }
+    var vibrate by remember(alarm?.id) { mutableStateOf(alarm?.vibrate ?: true) }
+    var snoozeMinutes by remember(alarm?.id) { mutableIntStateOf(alarm?.snoozeMinutes ?: 5) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (alarm == null) "Novo alarme" else "Editar alarme") },
         text = {
-            Column {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 560.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 AlarmTimeSelector(
                     hour = hour,
                     minute = minute,
@@ -66,10 +85,21 @@ fun AlarmEditorDialog(
                     color = AppColors.TextSecondary,
                     fontSize = 11.sp
                 )
+                Spacer(Modifier.height(14.dp))
+                AlarmOptionsSelector(
+                    sound = sound,
+                    vibrate = vibrate,
+                    snoozeMinutes = snoozeMinutes,
+                    onSoundChange = { sound = it },
+                    onVibrateChange = { vibrate = it },
+                    onSnoozeChange = { snoozeMinutes = it }
+                )
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(hour, minute, label.trim(), days) }) {
+            TextButton(onClick = {
+                onConfirm(hour, minute, label.trim(), days, sound, vibrate, snoozeMinutes)
+            }) {
                 Text("Salvar")
             }
         },

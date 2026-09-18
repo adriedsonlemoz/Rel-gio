@@ -17,7 +17,10 @@ object AlarmCodec {
             if (alarm.enabled) 1 else 0,
             daysMask,
             label,
-            alarm.zoneId.orEmpty()
+            alarm.zoneId.orEmpty(),
+            alarm.sound.storageKey,
+            if (alarm.vibrate) 1 else 0,
+            alarm.snoozeMinutes
         ).joinToString(":")
     }
 
@@ -29,8 +32,8 @@ object AlarmCodec {
     }
 
     private fun decodeAlarm(raw: String): Alarm? = runCatching {
-        val fields = raw.split(':', limit = 7)
-        if (fields.size !in 6..7) return null
+        val fields = raw.split(':', limit = 10)
+        if (fields.size !in 6..10) return null
         val mask = fields[4].toInt()
         Alarm(
             id = fields[0].toLong(),
@@ -41,7 +44,10 @@ object AlarmCodec {
                 mask and (1 shl (day.value - 1)) != 0
             },
             label = decodeText(fields[5]),
-            zoneId = fields.getOrNull(6)?.takeIf { it.isNotBlank() }
+            zoneId = fields.getOrNull(6)?.takeIf { it.isNotBlank() },
+            sound = AlarmSound.fromStorage(fields.getOrNull(7)),
+            vibrate = fields.getOrNull(8)?.let { it == "1" } ?: true,
+            snoozeMinutes = fields.getOrNull(9)?.toIntOrNull()?.takeIf { it in setOf(0, 5, 10, 15) } ?: 5
         )
     }.getOrNull()
 

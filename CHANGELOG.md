@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.5.0
+
+- Adicionada configuração individual de som por alarme: alarme padrão, toque do telefone, som de notificação ou sem som.
+- Adicionada opção individual para ativar/desativar vibração por alarme.
+- Adicionada soneca configurável por alarme em 5, 10 ou 15 minutos, com opção de desativar.
+- A notificação de alarme agora oferece ação `Soneca X min` quando a função está habilitada.
+- A soneca usa um agendamento separado e não altera o horário nem a repetição original do alarme.
+- Alarmes recorrentes continuam reagendando o próximo dia normalmente mesmo quando a ocorrência atual é adiada por soneca.
+- Configurações de som/vibração/soneca aparecem resumidas no card do alarme.
+- O editor de alarmes passou a ter rolagem interna para acomodar as novas opções em telas menores.
+- Codec de persistência ampliado com compatibilidade retroativa: alarmes antigos recebem som padrão, vibração ativa e soneca de 5 minutos.
+- Fallback por notificação passou a respeitar combinações de som/vibração por meio de canais compatíveis no Android 8+.
+- Adicionados testes de persistência para as novas opções e migração de alarmes legados.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.4.0
 
 - Corrigida a falha de compilação do menu inferior causada pelo uso de `ModalBottomSheet` sem opt-in explícito da API experimental do Material 3.

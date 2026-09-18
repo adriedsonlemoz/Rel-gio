@@ -16,11 +16,7 @@ class AlarmRingingService : Service() {
     private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
     private val handler = Handler(Looper.getMainLooper())
-    private val autoStop = Runnable {
-        stopRinging()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
-    }
+    private val autoStop = Runnable { finishRinging() }
 
     override fun onCreate() {
         super.onCreate()
@@ -28,14 +24,22 @@ class AlarmRingingService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val alarmId = intent?.getLongExtra(EXTRA_ALARM_ID, -1L) ?: -1L
         if (intent?.action == ACTION_STOP) {
-            stopRinging()
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
+            AlarmNotificationManager(this).cancelFallback(alarmId)
+            finishRinging()
+            return START_NOT_STICKY
+        }
+        if (intent?.action == ACTION_SNOOZE) {
+            val alarm = AlarmRepository(this).find(alarmId)
+            if (alarm != null && alarm.snoozeMinutes > 0) {
+                AlarmScheduler(this).scheduleSnooze(alarm)
+            }
+            AlarmNotificationManager(this).cancelFallback(alarmId)
+            finishRinging()
             return START_NOT_STICKY
         }
 
-        val alarmId = intent?.getLongExtra(EXTRA_ALARM_ID, -1L) ?: -1L
         val alarm = AlarmRepository(this).find(alarmId) ?: alarmFromIntent(intent) ?: run {
             stopSelf()
             return START_NOT_STICKY
@@ -44,7 +48,7 @@ class AlarmRingingService : Service() {
             AlarmNotificationManager.SERVICE_NOTIFICATION_ID,
             AlarmNotificationManager(this).buildRinging(alarm)
         )
-        startRinging()
+        startRinging(alarm)
         return START_NOT_STICKY
     }
 
@@ -55,33 +59,42 @@ class AlarmRingingService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private fun startRinging() {
+    private fun startRinging(alarm: Alarm) {
         stopRinging()
-        val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        runCatching {
-            mediaPlayer = MediaPlayer().apply {
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build()
-                )
-                setWakeMode(this@AlarmRingingService, PowerManager.PARTIAL_WAKE_LOCK)
-                setDataSource(this@AlarmRingingService, uri)
-                isLooping = true
-                prepare()
-                start()
+        val ringtoneType = ringtoneType(alarm.sound)
+        if (ringtoneType != null) {
+            val uri = RingtoneManager.getDefaultUri(ringtoneType)
+                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            runCatching {
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    setWakeMode(this@AlarmRingingService, PowerManager.PARTIAL_WAKE_LOCK)
+                    setDataSource(this@AlarmRingingService, uri)
+                    isLooping = true
+                    prepare()
+                    start()
+                }
             }
         }
-        vibrator = getSystemService(Vibrator::class.java)?.also { device ->
-            if (device.hasVibrator()) {
-                device.vibrate(
-                    VibrationEffect.createWaveform(longArrayOf(0, 500, 500), 0)
-                )
+        if (alarm.vibrate) {
+            vibrator = getSystemService(Vibrator::class.java)?.also { device ->
+                if (device.hasVibrator()) {
+                    device.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 500, 500), 0))
+                }
             }
         }
         handler.postDelayed(autoStop, MAX_RING_MILLIS)
+    }
+
+    private fun finishRinging() {
+        stopRinging()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
     }
 
     private fun stopRinging() {
@@ -91,6 +104,13 @@ class AlarmRingingService : Service() {
         mediaPlayer = null
         vibrator?.cancel()
         vibrator = null
+    }
+
+    private fun ringtoneType(sound: AlarmSound): Int? = when (sound) {
+        AlarmSound.ALARM -> RingtoneManager.TYPE_ALARM
+        AlarmSound.RINGTONE -> RingtoneManager.TYPE_RINGTONE
+        AlarmSound.NOTIFICATION -> RingtoneManager.TYPE_NOTIFICATION
+        AlarmSound.SILENT -> null
     }
 
     private fun alarmFromIntent(intent: Intent?): Alarm? {
@@ -109,6 +129,7 @@ class AlarmRingingService : Service() {
     companion object {
         const val ACTION_RING = "com.example.relogioflutuante.action.RING_ALARM"
         const val ACTION_STOP = "com.example.relogioflutuante.action.STOP_ALARM"
+        const val ACTION_SNOOZE = "com.example.relogioflutuante.action.SNOOZE_ALARM"
         const val EXTRA_ALARM_ID = "alarm_id"
         const val EXTRA_HOUR = "alarm_hour"
         const val EXTRA_MINUTE = "alarm_minute"

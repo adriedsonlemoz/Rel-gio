@@ -27,6 +27,7 @@ import com.example.relogioflutuante.alarms.Alarm
 import com.example.relogioflutuante.alarms.AlarmFormatting
 import com.example.relogioflutuante.alarms.AlarmRepository
 import com.example.relogioflutuante.alarms.AlarmScheduler
+import com.example.relogioflutuante.alarms.AlarmSound
 import com.example.relogioflutuante.ui.components.AppScreenColumn
 import com.example.relogioflutuante.ui.components.InfoCard
 import com.example.relogioflutuante.ui.components.alarms.AlarmListCard
@@ -123,8 +124,11 @@ fun AlarmScreen(
         AlarmEditorDialog(
             alarm = editing,
             onDismiss = { showEditor = false },
-            onConfirm = { hour, minute, label, days ->
-                val saved = saveAlarm(repository, scheduler, editing, hour, minute, label, days)
+            onConfirm = { hour, minute, label, days, sound, vibrate, snoozeMinutes ->
+                val saved = saveAlarm(
+                    repository, scheduler, editing, hour, minute, label, days,
+                    sound, vibrate, snoozeMinutes
+                )
                 alarms = repository.all()
                 showEditor = false
                 editing = null
@@ -141,7 +145,10 @@ private fun saveAlarm(
     hour: Int,
     minute: Int,
     label: String,
-    days: Set<DayOfWeek>
+    days: Set<DayOfWeek>,
+    sound: AlarmSound,
+    vibrate: Boolean,
+    snoozeMinutes: Int
 ): Alarm {
     val alarm = Alarm(
         id = existing?.id ?: repository.nextId(),
@@ -150,7 +157,10 @@ private fun saveAlarm(
         label = label,
         repeatDays = days,
         enabled = true,
-        zoneId = existing?.zoneId
+        zoneId = existing?.zoneId,
+        sound = sound,
+        vibrate = vibrate,
+        snoozeMinutes = snoozeMinutes
     )
     repository.save(alarm)
     scheduler.schedule(alarm)
