@@ -9,7 +9,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +53,7 @@ fun AlarmScreen(
     var alarms by remember { mutableStateOf(repository.all()) }
     var editing by remember { mutableStateOf<Alarm?>(null) }
     var showEditor by remember { mutableStateOf(false) }
+    var presetPendingDelete by remember { mutableStateOf<Alarm?>(null) }
     var exactAllowed by remember { mutableStateOf(scheduler.canScheduleExact()) }
     var notificationsAllowed by remember { mutableStateOf(notificationsAllowed(context)) }
     val nowMillis by produceState(initialValue = System.currentTimeMillis()) {
@@ -110,10 +113,14 @@ fun AlarmScreen(
             },
             onEdit = { alarm -> editing = alarm; showEditor = true },
             onDelete = { alarm ->
-                scheduler.cancel(alarm.id)
-                repository.delete(alarm.id)
-                alarms = repository.all()
-                onMessage("Alarme excluído")
+                val isPreset = AlarmDefaults.definitions.any { AlarmDefaults.matches(alarm, it) }
+                if (isPreset) {
+                    presetPendingDelete = alarm
+                } else {
+                    deleteAlarm(repository, scheduler, alarm)
+                    alarms = repository.all()
+                    onMessage("Alarme excluído")
+                }
             }
         )
 
@@ -144,6 +151,25 @@ fun AlarmScreen(
         ) { Text("+ Adicionar alarme") }
 
         InfoCard("Toque em um alarme para editar. Repetições são reagendadas automaticamente.")
+    }
+
+    presetPendingDelete?.let { alarm ->
+        AlertDialog(
+            onDismissRequest = { presetPendingDelete = null },
+            title = { Text("Excluir alarme padrão?") },
+            text = { Text("${alarm.label} será removido. Ele só volta se você usar Restaurar em Alarmes padrão.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    deleteAlarm(repository, scheduler, alarm)
+                    alarms = repository.all()
+                    presetPendingDelete = null
+                    onMessage("Alarme padrão excluído")
+                }) { Text("Excluir") }
+            },
+            dismissButton = {
+                TextButton(onClick = { presetPendingDelete = null }) { Text("Cancelar") }
+            }
+        )
     }
 
     if (showEditor) {
@@ -191,6 +217,15 @@ private fun saveAlarm(
     repository.save(alarm)
     scheduler.schedule(alarm)
     return alarm
+}
+
+private fun deleteAlarm(
+    repository: AlarmRepository,
+    scheduler: AlarmScheduler,
+    alarm: Alarm
+) {
+    scheduler.cancel(alarm.id)
+    repository.delete(alarm.id)
 }
 
 private fun notificationsAllowed(context: android.content.Context): Boolean {

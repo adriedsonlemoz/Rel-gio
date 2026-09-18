@@ -1,5 +1,8 @@
 package com.example.relogioflutuante.ui.components.alarms
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +15,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -28,41 +35,68 @@ fun AlarmDefaultsCard(
     onRestore: (AlarmDefaults.Definition) -> Unit,
     onRestoreAll: () -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
     val missing = AlarmDefaults.definitions.filter { AlarmDefaults.findExisting(alarms, it) == null }
+    val presentCount = AlarmDefaults.definitions.size - missing.size
+
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().animateContentSize(),
         color = AppColors.Surface,
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 2.dp
     ) {
-        Column(
-            modifier = Modifier.padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(11.dp)
-        ) {
-            Text(
-                "ALARMES PADRÃO",
-                color = AppColors.AccentSoft,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.2.sp
-            )
-            Text(
-                "Eventos Zyrvorthian no horário de Brasília. Restaurar é sempre manual.",
-                color = AppColors.TextSecondary,
-                fontSize = 12.sp,
-                lineHeight = 17.sp
-            )
-            AlarmDefaults.definitions.forEach { definition ->
-                val present = AlarmDefaults.findExisting(alarms, definition) != null
-                DefaultAlarmRow(definition, present) { onRestore(definition) }
+        Column(modifier = Modifier.padding(15.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "ALARMES PADRÃO",
+                        color = AppColors.AccentSoft,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.2.sp
+                    )
+                    Text(
+                        "$presentCount de ${AlarmDefaults.definitions.size} presentes • Brasília",
+                        color = AppColors.TextSecondary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 3.dp)
+                    )
+                }
+                Text(
+                    if (expanded) "▲" else "▼",
+                    color = AppColors.AccentSoft,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            if (missing.size > 1) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = onRestoreAll,
-                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent),
-                    shape = RoundedCornerShape(14.dp)
-                ) { Text("Restaurar ${missing.size} alarmes ausentes") }
+
+            AnimatedVisibility(visible = expanded) {
+                Column(
+                    modifier = Modifier.padding(top = 13.dp),
+                    verticalArrangement = Arrangement.spacedBy(11.dp)
+                ) {
+                    Text(
+                        "Eventos Zyrvorthian no horário de Brasília. Alarmes apagados só voltam quando você restaurar.",
+                        color = AppColors.TextSecondary,
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp
+                    )
+                    AlarmDefaults.definitions.forEach { definition ->
+                        val present = AlarmDefaults.findExisting(alarms, definition) != null
+                        DefaultAlarmRow(definition, present) { onRestore(definition) }
+                    }
+                    if (missing.size > 1) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = onRestoreAll,
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent),
+                            shape = RoundedCornerShape(14.dp)
+                        ) { Text("Restaurar ${missing.size} alarmes ausentes") }
+                    }
+                }
             }
         }
     }

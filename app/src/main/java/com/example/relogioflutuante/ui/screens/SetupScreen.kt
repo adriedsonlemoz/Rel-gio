@@ -3,6 +3,10 @@ package com.example.relogioflutuante.ui.screens
 import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -98,32 +102,43 @@ private fun SetupHeader(
     restrictedSettingsRequired: Boolean,
     onBack: () -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        if (showBack) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_back),
-                    contentDescription = "Voltar",
-                    tint = AppColors.TextPrimary
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = AppColors.Surface,
+        shape = RoundedCornerShape(20.dp),
+        shadowElevation = 3.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (showBack) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_back),
+                        contentDescription = "Voltar",
+                        tint = AppColors.AccentSoft
+                    )
+                }
+            }
+            Column(Modifier.weight(1f).padding(horizontal = if (showBack) 0.dp else 8.dp)) {
+                Text(
+                    "Ativar relógio flutuante",
+                    color = AppColors.TextPrimary,
+                    fontSize = 21.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    if (restrictedSettingsRequired) {
+                        "São apenas dois passos na primeira configuração."
+                    } else {
+                        "Neste Android, basta ativar a Acessibilidade."
+                    },
+                    color = AppColors.TextSecondary,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
                 )
             }
-        }
-        Column(Modifier.weight(1f)) {
-            Text(
-                "Ativar relógio flutuante",
-                color = AppColors.TextPrimary,
-                fontSize = 23.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                if (restrictedSettingsRequired) {
-                    "São apenas dois passos na primeira configuração."
-                } else {
-                    "Neste Android, basta ativar a Acessibilidade."
-                },
-                color = AppColors.TextSecondary,
-                fontSize = 12.sp
-            )
         }
     }
 }

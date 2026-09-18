@@ -1,5 +1,7 @@
 package com.example.relogioflutuante.ui.dialogs
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.relogioflutuante.alarms.AlarmScheduler
 import com.example.relogioflutuante.state.readAppDiagnostics
+import com.example.relogioflutuante.ui.SettingsNavigator
 import com.example.relogioflutuante.ui.theme.AppColors
 
 @Composable
@@ -35,11 +39,10 @@ fun AboutDialog(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val diagnostics = remember { readAppDiagnostics(context) }
+    val navigator = remember(context) { SettingsNavigator(context) }
+    val scheduler = remember(context) { AlarmScheduler(context) }
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
             modifier = Modifier.fillMaxWidth(0.92f).heightIn(max = 690.dp),
             shape = RoundedCornerShape(26.dp),
@@ -49,7 +52,7 @@ fun AboutDialog(
             Column(modifier = Modifier.padding(18.dp)) {
                 Column(
                     modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text("Relógio Flutuante", color = AppColors.TextPrimary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                     Text(
@@ -65,17 +68,27 @@ fun AboutDialog(
                         lineHeight = 18.sp
                     )
                     ChangesCard()
-                    DiagnosticCard(diagnostics) {
-                        clipboard.setText(AnnotatedString(diagnostics.asText()))
-                        onMessage("Diagnóstico copiado")
-                    }
-                    PixCard(onCopyPix)
-                    Text(
-                        "O modo por Acessibilidade apenas desenha a janela. O aplicativo não lê a tela e não executa cliques ou gestos.",
-                        color = AppColors.TextSecondary,
-                        fontSize = 11.sp,
-                        lineHeight = 16.sp
+                    DiagnosticCard(
+                        diagnostics = diagnostics,
+                        onCopy = {
+                            clipboard.setText(AnnotatedString(diagnostics.asText()))
+                            onMessage("Diagnóstico copiado")
+                        },
+                        onFixOverlay = navigator::openOverlayPermission,
+                        onFixAccessibility = navigator::openAccessibility,
+                        onFixExactAlarms = {
+                            runCatching { context.startActivity(scheduler.exactAlarmSettingsIntent()) }
+                                .onFailure { navigator.openAppDetails() }
+                        },
+                        onFixNotifications = {
+                            context.startActivity(
+                                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                            )
+                        }
                     )
+                    PrivacyCard()
+                    PixCard(onCopyPix)
                 }
                 TextButton(
                     onClick = onDismiss,

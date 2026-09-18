@@ -69,7 +69,7 @@ fun OverlayPrimaryStatusCard(
                     Text(
                         "Controle principal da janela flutuante",
                         color = AppColors.TextSecondary,
-                        fontSize = 11.sp
+                        fontSize = 12.sp
                     )
                 }
                 Surface(

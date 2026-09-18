@@ -10,20 +10,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.relogioflutuante.state.CountdownState
+import com.example.relogioflutuante.state.OverlayMode
+import com.example.relogioflutuante.state.OverlayState
 import com.example.relogioflutuante.state.formatDuration
 import com.example.relogioflutuante.ui.components.AppScreenColumn
 import com.example.relogioflutuante.ui.components.CountdownActions
 import com.example.relogioflutuante.ui.components.CountdownSetupCard
 import com.example.relogioflutuante.ui.components.TimeCard
+import com.example.relogioflutuante.ui.theme.AppColors
 import com.example.relogioflutuante.ui.dialogs.FinishedCountdownDialog
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun CountdownScreen() {
     val context = LocalContext.current
-    var hours by remember { mutableStateOf("00") }
-    var minutes by remember { mutableStateOf("05") }
-    var seconds by remember { mutableStateOf("00") }
+    var hours by remember { mutableIntStateOf(0) }
+    var minutes by remember { mutableIntStateOf(5) }
+    var seconds by remember { mutableIntStateOf(0) }
     var showFinishedDialog by remember { mutableStateOf(false) }
     var refreshKey by remember { mutableIntStateOf(0) }
 
@@ -63,6 +74,23 @@ fun CountdownScreen() {
             }
         )
 
+        val countdownOverlayActive = OverlayState.isEnabled(context) && OverlayState.mode(context) == OverlayMode.COUNTDOWN
+        if (countdownOverlayActive) {
+            Surface(
+                color = AppColors.Success.copy(alpha = 0.11f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    "● SOBREPOSTO AO JOGO",
+                    modifier = Modifier.padding(horizontal = 11.dp, vertical = 7.dp),
+                    color = AppColors.Success,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.6.sp
+                )
+            }
+        }
+
         if (showSetup) {
             CountdownSetupCard(
                 hours = hours,
@@ -73,12 +101,7 @@ fun CountdownScreen() {
                 onMinutesChange = { minutes = it },
                 onSecondsChange = { seconds = it },
                 onApply = {
-                    CountdownState.setDuration(
-                        context,
-                        hours.toIntOrNull() ?: 0,
-                        minutes.toIntOrNull() ?: 0,
-                        seconds.toIntOrNull() ?: 0
-                    )
+                    CountdownState.setDuration(context, hours, minutes, seconds)
                     refreshKey++
                 }
             )

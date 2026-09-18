@@ -1,5 +1,6 @@
 package com.example.relogioflutuante.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.state.OverlayAppearance
@@ -49,12 +51,9 @@ fun OverlayAppearanceCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Aparência", color = AppColors.TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text("Ajuste sem sair do jogo", color = AppColors.TextSecondary, fontSize = 11.sp)
+                    Text("Ajuste o overlay para cada situação", color = AppColors.TextSecondary, fontSize = 12.sp)
                 }
-                Surface(
-                    color = AppColors.Accent.copy(alpha = 0.13f),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
+                Surface(color = AppColors.Accent.copy(alpha = 0.13f), shape = RoundedCornerShape(10.dp)) {
                     Text(
                         "${appearance.opacityPercent}%",
                         modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
@@ -64,51 +63,73 @@ fun OverlayAppearanceCard(
                     )
                 }
             }
+
             Spacer(Modifier.height(14.dp))
-            Text("Presets rápidos", color = AppColors.TextSecondary, fontSize = 12.sp)
-            Spacer(Modifier.height(6.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(7.dp)
-            ) {
+            SectionLabel("Presets rápidos")
+            Spacer(Modifier.height(7.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OverlayPreset.entries.forEach { preset ->
-                    PresetChip(
+                    PresetCard(
                         modifier = Modifier.weight(1f),
-                        label = preset.label,
+                        preset = preset,
                         onClick = { onPresetApply(preset) }
                     )
                 }
             }
-            Spacer(Modifier.height(14.dp))
-            Text("Formato", color = AppColors.TextSecondary, fontSize = 12.sp)
-            Spacer(Modifier.height(5.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                FormatChip("HH:MM:SS", OverlayTimeFormat.FULL, appearance, onFormatChange)
-                FormatChip("MM:SS", OverlayTimeFormat.MINUTES_SECONDS, appearance, onFormatChange)
-                FormatChip(":SS", OverlayTimeFormat.SECONDS_ONLY, appearance, onFormatChange)
+
+            Spacer(Modifier.height(16.dp))
+            Surface(color = AppColors.SurfaceStrong.copy(alpha = 0.5f), shape = RoundedCornerShape(16.dp)) {
+                Column(Modifier.padding(12.dp)) {
+                    SectionLabel("Formato")
+                    Spacer(Modifier.height(6.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                        FormatChip("HH:MM:SS", OverlayTimeFormat.FULL, appearance, onFormatChange)
+                        FormatChip("MM:SS", OverlayTimeFormat.MINUTES_SECONDS, appearance, onFormatChange)
+                        FormatChip(":SS", OverlayTimeFormat.SECONDS_ONLY, appearance, onFormatChange)
+                    }
+                }
             }
-            Spacer(Modifier.height(12.dp))
-            Text("Tamanho", color = AppColors.TextSecondary, fontSize = 12.sp)
-            Spacer(Modifier.height(5.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                SizeChip("Pequeno", OverlaySize.SMALL, appearance, onSizeChange)
-                SizeChip("Médio", OverlaySize.MEDIUM, appearance, onSizeChange)
-                SizeChip("Grande", OverlaySize.LARGE, appearance, onSizeChange)
+
+            Spacer(Modifier.height(10.dp))
+            Surface(color = AppColors.SurfaceStrong.copy(alpha = 0.5f), shape = RoundedCornerShape(16.dp)) {
+                Column(Modifier.padding(12.dp)) {
+                    SectionLabel("Tamanho")
+                    Spacer(Modifier.height(6.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                        SizeChip("Pequeno", OverlaySize.SMALL, appearance, onSizeChange)
+                        SizeChip("Médio", OverlaySize.MEDIUM, appearance, onSizeChange)
+                        SizeChip("Grande", OverlaySize.LARGE, appearance, onSizeChange)
+                    }
+                }
             }
-            Spacer(Modifier.height(14.dp))
-            Text("Opacidade", color = AppColors.TextSecondary, fontSize = 12.sp)
-            Slider(
-                value = appearance.opacityPercent.toFloat(),
-                onValueChange = { onOpacityChange(it.roundToInt()) },
-                valueRange = 40f..100f,
-                colors = SliderDefaults.colors(
-                    thumbColor = AppColors.AccentSoft,
-                    activeTrackColor = AppColors.Accent,
-                    inactiveTrackColor = AppColors.SurfaceStrong,
-                    activeTickColor = AppColors.Accent,
-                    inactiveTickColor = AppColors.SurfaceStrong
-                )
-            )
+
+            Spacer(Modifier.height(10.dp))
+            Surface(color = AppColors.SurfaceStrong.copy(alpha = 0.5f), shape = RoundedCornerShape(16.dp)) {
+                Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        SectionLabel("Opacidade", Modifier.weight(1f))
+                        Text(
+                            "${appearance.opacityPercent}%",
+                            color = AppColors.AccentSoft,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    Slider(
+                        modifier = Modifier.height(34.dp),
+                        value = appearance.opacityPercent.toFloat(),
+                        onValueChange = { onOpacityChange(it.roundToInt()) },
+                        valueRange = 40f..100f,
+                        colors = SliderDefaults.colors(
+                            thumbColor = AppColors.AccentSoft,
+                            activeTrackColor = AppColors.Accent,
+                            inactiveTrackColor = AppColors.TextSecondary.copy(alpha = 0.14f)
+                        )
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = AppColors.SurfaceStrong.copy(alpha = 0.72f),
@@ -123,8 +144,8 @@ fun OverlayAppearanceCard(
                         Text(
                             if (appearance.positionLocked) "Toques passam direto para o jogo." else "Permite mover e fechar a janela.",
                             color = AppColors.TextSecondary,
-                            fontSize = 11.sp,
-                            lineHeight = 15.sp
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
                         )
                     }
                     Switch(
@@ -143,26 +164,43 @@ fun OverlayAppearanceCard(
 }
 
 @Composable
-private fun PresetChip(
-    modifier: Modifier,
-    label: String,
-    onClick: () -> Unit
-) {
-    Surface(
-        modifier = modifier,
-        color = AppColors.SurfaceStrong,
-        shape = RoundedCornerShape(12.dp),
-        onClick = onClick
-    ) {
-        Text(
-            text = label,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 9.dp),
-            color = AppColors.AccentSoft,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
+private fun PresetCard(modifier: Modifier, preset: OverlayPreset, onClick: () -> Unit) {
+    val description = when (preset) {
+        OverlayPreset.GAME -> "Equilibrado\ne bloqueado"
+        OverlayPreset.DISCREET -> "Menor e\ntransparente"
+        OverlayPreset.COUNTDOWN -> "Segundos em\ndestaque"
     }
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        color = AppColors.SurfaceStrong,
+        shape = RoundedCornerShape(14.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                preset.label,
+                color = AppColors.AccentSoft,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                description,
+                color = AppColors.TextSecondary,
+                fontSize = 9.sp,
+                lineHeight = 12.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(text, modifier = modifier, color = AppColors.TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
 }
 
 @Composable
@@ -183,7 +221,7 @@ private fun StyledChip(label: String, selected: Boolean, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp),
         label = { Text(label, fontSize = 11.sp) },
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = AppColors.SurfaceStrong,
+            containerColor = AppColors.Surface,
             labelColor = AppColors.TextSecondary,
             selectedContainerColor = AppColors.Accent.copy(alpha = 0.25f),
             selectedLabelColor = AppColors.AccentSoft

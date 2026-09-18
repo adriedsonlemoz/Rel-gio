@@ -21,6 +21,6 @@ fun AlarmOptionsSummary(alarm: Alarm) {
         text = text,
         modifier = Modifier.padding(top = 4.dp),
         color = AppColors.TextSecondary,
-        fontSize = 10.sp
+        fontSize = 11.sp
     )
 }

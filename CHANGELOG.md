@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.8.0
+
+- Aplicado novo ciclo de refinamento visual baseado na análise do uso real em vídeo.
+- Tela Alarmes agora destaca o próximo alarme no cabeçalho e usa cards mais compactos.
+- Alarmes fixos de Brasília recebem selo visual compacto em vez de linha técnica de fuso.
+- Chips dos dias da semana foram reduzidos para diminuir a densidade visual dos cards.
+- Alarmes padrão viraram seção recolhível, mostrando apenas o resumo quando fechada.
+- Exclusão de Corvith, Ortson ou Zulanka agora pede confirmação; alarmes comuns continuam com exclusão direta.
+- Editor de alarme dividido em blocos visuais de Horário, Repetição e Aviso.
+- Tela Contagem deixou de depender do teclado: horas, minutos e segundos usam controles +/−.
+- Adicionados atalhos rápidos de 30 s, 1 min, 5 min e 10 min na contagem regressiva.
+- A Contagem mostra badge quando está efetivamente selecionada e ativa no overlay.
+- Tela Sobre reorganizada em seções expansíveis: alterações, diagnóstico, privacidade e apoio.
+- Linhas problemáticas do diagnóstico agora oferecem ação `Corrigir` e abrem a configuração Android correspondente.
+- Presets do overlay foram transformados em pequenos cards com descrição do efeito de cada um.
+- Formato, tamanho e opacidade do overlay foram separados em blocos visuais mais claros; slider ficou mais discreto.
+- Tela de ativação ganhou cabeçalho em card para manter a mesma linguagem visual das telas principais.
+- Barra inferior ficou ligeiramente mais compacta, com maior contraste no item ativo.
+- Aumentado o tamanho de textos secundários importantes e adicionado respiro inferior consistente nas telas roláveis.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.7.1
 
 - Corrigido erro de compilação no GitHub Actions causado pelo import explícito de `androidx.compose.foundation.layout.weight` em `AboutDialog.kt` e `AboutSections.kt`.

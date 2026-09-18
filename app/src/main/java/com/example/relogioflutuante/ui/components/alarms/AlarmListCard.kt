@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.relogioflutuante.R
 import com.example.relogioflutuante.alarms.Alarm
+import com.example.relogioflutuante.alarms.AlarmDefaults
 import com.example.relogioflutuante.alarms.AlarmFormatting
 import com.example.relogioflutuante.ui.theme.AppColors
 import java.time.DayOfWeek
@@ -45,13 +46,14 @@ fun AlarmListCard(
     onEdit: (Alarm) -> Unit,
     onDelete: (Alarm) -> Unit
 ) {
+    val nextAlarm = alarms.firstOrNull { it.enabled }
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = AppColors.Surface,
         shape = RoundedCornerShape(20.dp),
-        shadowElevation = 3.dp
+        shadowElevation = 2.dp
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column {
             Row(
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 13.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -67,17 +69,23 @@ fun AlarmListCard(
                     Text(
                         if (alarms.isEmpty()) "Organize seus próximos avisos" else "${alarms.count { it.enabled }} ativos de ${alarms.size}",
                         color = AppColors.TextSecondary,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(top = 2.dp)
                     )
+                    nextAlarm?.let {
+                        Text(
+                            "Próximo: ${it.label.ifBlank { "Alarme" }} • ${AlarmFormatting.nextTriggerSummary(it, nowMillis)}",
+                            color = AppColors.AccentSoft,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
                 if (alarms.isNotEmpty()) {
-                    Surface(
-                        color = AppColors.Accent.copy(alpha = 0.13f),
-                        shape = CircleShape
-                    ) {
+                    Surface(color = AppColors.Accent.copy(alpha = 0.13f), shape = CircleShape) {
                         Text(
-                            text = alarms.size.toString(),
+                            alarms.size.toString(),
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                             color = AppColors.AccentSoft,
                             fontWeight = FontWeight.Bold,
@@ -106,15 +114,10 @@ fun AlarmListCard(
 @Composable
 private fun EmptyAlarmState() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 24.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Surface(
-            color = AppColors.Accent.copy(alpha = 0.12f),
-            shape = CircleShape
-        ) {
+        Surface(color = AppColors.Accent.copy(alpha = 0.12f), shape = CircleShape) {
             Icon(
                 painter = painterResource(R.drawable.ic_nav_alarm),
                 contentDescription = null,
@@ -126,14 +129,14 @@ private fun EmptyAlarmState() {
             "Nenhum alarme ainda",
             color = AppColors.TextPrimary,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp,
+            fontSize = 16.sp,
             modifier = Modifier.padding(top = 12.dp)
         )
         Text(
             "Crie um alarme único ou escolha os dias da semana para repetir.",
             color = AppColors.TextSecondary,
-            fontSize = 12.sp,
-            lineHeight = 17.sp,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 5.dp)
         )
@@ -150,53 +153,45 @@ private fun AlarmRow(
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onEdit(alarm) }
-            .padding(horizontal = 15.dp, vertical = 13.dp),
+        modifier = Modifier.fillMaxWidth().clickable { onEdit(alarm) }.padding(horizontal = 15.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                AlarmFormatting.time(alarm),
-                color = if (alarm.enabled) AppColors.TextPrimary else AppColors.TextSecondary,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    AlarmFormatting.time(alarm),
+                    color = if (alarm.enabled) AppColors.TextPrimary else AppColors.TextSecondary,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 29.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (alarm.zoneId == AlarmDefaults.BRASILIA_ZONE) ZoneBadge()
+            }
             Text(
                 alarm.label.ifBlank { "Alarme" },
                 color = if (alarm.enabled) AppColors.TextPrimary else AppColors.TextSecondary,
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1
             )
-            AlarmFormatting.zoneSummary(alarm)?.let { zone ->
-                Text(
-                    zone,
-                    color = AppColors.TextSecondary,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
-            }
             if (alarm.repeatDays.isNotEmpty()) {
                 Row(
-                    modifier = Modifier.padding(top = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.padding(top = 5.dp),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     DayOfWeek.entries.filter { it in alarm.repeatDays }.forEach { day ->
                         RepeatDayChip(AlarmFormatting.shortDay(day), alarm.enabled)
                     }
                 }
             } else {
-                Text("Uma vez", color = AppColors.TextSecondary, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
+                Text("Uma vez", color = AppColors.TextSecondary, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
             }
             Text(
                 AlarmFormatting.nextTriggerSummary(alarm, nowMillis),
-                modifier = Modifier.padding(top = 6.dp),
+                modifier = Modifier.padding(top = 5.dp),
                 color = if (alarm.enabled) AppColors.AccentSoft else AppColors.TextSecondary,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 fontWeight = if (alarm.enabled) FontWeight.SemiBold else FontWeight.Normal
             )
             AlarmOptionsSummary(alarm)
@@ -220,31 +215,9 @@ private fun AlarmRow(
                 )
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                DropdownMenuItem(
-                    text = { Text("Editar") },
-                    onClick = { menuOpen = false; onEdit(alarm) }
-                )
-                DropdownMenuItem(
-                    text = { Text("Excluir") },
-                    onClick = { menuOpen = false; onDelete(alarm) }
-                )
+                DropdownMenuItem(text = { Text("Editar") }, onClick = { menuOpen = false; onEdit(alarm) })
+                DropdownMenuItem(text = { Text("Excluir") }, onClick = { menuOpen = false; onDelete(alarm) })
             }
         }
-    }
-}
-
-@Composable
-private fun RepeatDayChip(label: String, enabled: Boolean) {
-    Surface(
-        color = if (enabled) AppColors.Accent.copy(alpha = 0.14f) else AppColors.SurfaceStrong,
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(
-            label,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
-            color = if (enabled) AppColors.AccentSoft else AppColors.TextSecondary,
-            fontSize = 9.sp,
-            fontWeight = FontWeight.SemiBold
-        )
     }
 }

@@ -25,7 +25,7 @@ fun AppScreenColumn(
     val base = modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())
-        .padding(horizontal = horizontalPadding, vertical = 10.dp)
+        .padding(start = horizontalPadding, end = horizontalPadding, top = 10.dp, bottom = 22.dp)
     Column(
         modifier = if (imeAware) base.imePadding() else base,
         horizontalAlignment = horizontalAlignment,

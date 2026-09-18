@@ -30,6 +30,13 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Cada alarme pode escolher som (alarme, toque, notificação ou silencioso), vibração e soneca de 5, 10 ou 15 minutos, ou deixar a soneca desativada.
 - Alarmes usam horário real do Android, podem tocar com áudio/vibração e são restaurados após reinicialização ou mudanças de horário/fuso.
 - Ícone próprio do aplicativo com variantes normal, redonda, adaptativa e monocromática, mantendo os elementos principais dentro da área segura dos launchers Android.
+- Tela Alarmes refinada com próximo disparo em destaque, presets padrão recolhíveis, selo Brasília e confirmação antes de excluir presets Zyrvorthian.
+- Editor de alarmes dividido visualmente em Horário, Repetição e Aviso.
+- Tela Contagem passa a usar seletores +/− e tempos rápidos, evitando abrir o teclado do Android.
+- A Contagem indica quando está sendo exibida no overlay.
+- Tela Sobre organizada em seções expansíveis para histórico, diagnóstico, privacidade e PIX.
+- Itens pendentes do diagnóstico podem abrir diretamente a configuração correspondente.
+- Presets do overlay ganharam descrições visuais e a aparência foi dividida em blocos mais claros.
 - A área `Sobre` concentra versão, histórico recente, diagnóstico rápido e apoio opcional por PIX (`adriedson@outlook.com`), com feedback ao copiar.
 
 ## Primeiro uso e permissões
@@ -111,7 +118,7 @@ O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow tamb�
 
 ## Sobre e diagnóstico
 
-A área `Sobre` apresenta as últimas mudanças em cards, versão atual e um diagnóstico rápido com estado do overlay, método de apresentação, Acessibilidade, permissão de sobreposição, alarmes exatos e notificações. O diagnóstico pode ser copiado para facilitar suporte em aparelhos com comportamento diferente. O PIX permanece somente nessa área, evitando ocupar espaço na tela principal.
+A área `Sobre` apresenta versão, histórico, diagnóstico, privacidade e PIX em seções expansíveis. O diagnóstico mostra o estado do overlay, método de apresentação, Acessibilidade, permissão de sobreposição, alarmes exatos e notificações; quando há um item pendente, a própria linha oferece acesso à configuração correspondente. O diagnóstico também pode ser copiado para facilitar suporte.
 
 ## Build
 
@@ -126,8 +133,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.7.1`
-- `versionCode`: `27`
+- `versionName`: `1.8.0`
+- `versionCode`: `28`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada

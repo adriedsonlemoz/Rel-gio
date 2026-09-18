@@ -67,22 +67,22 @@ private fun NavigationItem(
     onClick: () -> Unit
 ) {
     val background by animateColorAsState(
-        if (selected) AppColors.Accent.copy(alpha = 0.16f) else AppColors.Surface,
+        if (selected) AppColors.Accent.copy(alpha = 0.13f) else AppColors.Surface,
         label = "navBackground"
     )
     val contentColor by animateColorAsState(
-        if (selected) AppColors.AccentSoft else AppColors.TextSecondary,
+        if (selected) AppColors.TextPrimary else AppColors.TextSecondary,
         label = "navContent"
     )
-    val indicatorWidth by animateDpAsState(if (selected) 24.dp else 0.dp, label = "navIndicator")
+    val indicatorWidth by animateDpAsState(if (selected) 20.dp else 0.dp, label = "navIndicator")
 
     Column(
         modifier = modifier
             .padding(horizontal = 4.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(background)
             .clickable(onClick = onClick)
-            .padding(top = 5.dp, bottom = 4.dp),
+            .padding(top = 4.dp, bottom = 3.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -90,7 +90,7 @@ private fun NavigationItem(
                 painter = painterResource(item.iconRes),
                 contentDescription = item.label,
                 tint = contentColor,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(if (selected) 21.dp else 19.dp)
             )
         }
         Text(
@@ -101,9 +101,9 @@ private fun NavigationItem(
         )
         Box(
             Modifier
-                .padding(top = 3.dp)
-                .height(3.dp)
-                .size(width = indicatorWidth, height = 3.dp)
+                .padding(top = 2.dp)
+                .height(2.dp)
+                .size(width = indicatorWidth, height = 2.dp)
                 .background(AppColors.AccentSoft, CircleShape)
         )
     }
