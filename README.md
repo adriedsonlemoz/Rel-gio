@@ -1,6 +1,6 @@
 # Relógio Flutuante
 
-Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, contagem regressiva e janela compacta sobre outros aplicativos.
+Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, contagem regressiva, alarmes, fusos horários e janela compacta sobre outros aplicativos.
 
 ## Recursos
 
@@ -22,6 +22,8 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Layout edge-to-edge com proteção para recortes/notches e largura responsiva.
 - Fusos horários salvos na própria tela Relógio, com catálogo pesquisável de cidades, reordenação e remoção.
 - Cada fuso mostra `HH:mm:ss`, UTC, diferença para o fuso local e mudança de dia quando aplicável.
+- Aba Alarmes com criação, edição, ativação/desativação, exclusão, nome opcional e repetição por dias da semana.
+- Alarmes usam horário real do Android, podem tocar com áudio/vibração e são restaurados após reinicialização ou mudanças de horário/fuso.
 
 ## Primeiro uso e permissões
 
@@ -36,6 +38,14 @@ A tela de sobreposição normal também pode ser aberta pelo app. Em alguns Andr
 Na tela Relógio, `+ Adicionar` abre uma lista pronta de cidades e fusos. É possível pesquisar por cidade, país ou identificador IANA, adicionar vários horários, remover e reordenar a lista. Os fusos usam `ZoneId`, portanto acompanham automaticamente regras de horário de verão quando existentes.
 
 Os fusos mundiais usam o instante real fornecido pelo Android. O ajuste manual do relógio principal não altera os fusos internacionais; ele continua afetando apenas o horário principal do aplicativo e o overlay.
+
+## Alarmes
+
+A aba `Alarmes` permite criar alarmes únicos ou recorrentes por dias da semana. O nome é opcional, cada item pode ser ativado/desativado e os alarmes salvos permanecem no aparelho. Alarmes de uma única vez são desativados automaticamente depois de tocar; os recorrentes são reagendados.
+
+No Android 12 ou superior, o aplicativo verifica o acesso especial **Alarmes e lembretes**. Com o acesso liberado, usa alarmes exatos para maior precisão. Sem esse acesso, mantém um agendamento compatível menos preciso, sujeito aos atrasos que o Android pode aplicar. No Android 13 ou superior, a tela também solicita a permissão de notificações quando necessária.
+
+Quando o alarme dispara, o app inicia um serviço de toque com o som de alarme padrão do sistema em loop, vibração e uma notificação com a ação `Parar`. O toque contínuo é encerrado automaticamente após 5 minutos. Se o sistema bloquear a inicialização contínua em segundo plano, existe um fallback por notificação sonora.
 
 ## Overlay para jogo
 
@@ -65,13 +75,16 @@ O projeto inclui testes unitários para:
 - regras responsivas de largura, padding e tamanho do relógio;
 - validade e pesquisa do catálogo de fusos;
 - adição, remoção e reordenação dos fusos;
-- cálculo de offsets UTC e diferença relativa entre zonas.
+- cálculo de offsets UTC e diferença relativa entre zonas;
+- serialização/persistência dos alarmes;
+- cálculo do próximo disparo de alarme único e repetido;
+- resumos dos padrões de repetição.
 
 O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow também impede arquivos Kotlin com mais de **250 linhas**, ajudando a evitar componentes e classes monolíticas.
 
 ## Organização do código
 
-- `ui/screens/`: Relógio, Contagem, Sobreposição e Configuração inicial.
+- `ui/screens/`: Relógio, Contagem, Alarmes, Sobreposição e Configuração inicial.
 - `ui/components/`: componentes pequenos e reutilizáveis.
 - `ui/dialogs/`: diálogo Sobre.
 - `ui/theme/`: tema e paleta.
@@ -81,6 +94,8 @@ O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow tamb�
 - `ui/components/timezones/`: componentes pequenos da lista de fusos.
 - `ui/dialogs/timezones/`: seletor pesquisável de cidades.
 - `overlay/`: serviços, janela, estilo, arraste, formatação e notificações.
+- `alarms/`: modelo, persistência, agendamento, receivers, serviço de toque e regras de horário.
+- `ui/components/alarms/` e `ui/dialogs/alarms/`: lista, permissões e editor de alarmes.
 - `app/src/test/`: testes unitários.
 - `MainActivity.kt`: ponto de entrada e atualização de estado ao retornar das Configurações.
 
@@ -97,8 +112,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.1.5`
-- `versionCode`: `16`
+- `versionName`: `1.2.0`
+- `versionCode`: `17`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
@@ -110,3 +125,7 @@ A interface principal agora usa modo imersivo edge-to-edge. As barras do Android
 
 ## Fusos horários salvos
 A versão 1.1.5 adiciona relógios mundiais dentro da tela Relógio. A seleção fica salva localmente e pode ser reorganizada com os controles de posição, sem criar uma nova aba na navegação inferior.
+
+
+## Alarmes na versão 1.2.0
+A versão 1.2.0 adiciona uma aba própria de alarmes, com alarmes únicos ou recorrentes, nome opcional, controle de ativação e integração com o agendamento do Android. O app orienta a liberação de alarmes exatos quando necessária e mantém fallback compatível quando essa permissão não está disponível.

@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.2.0
+
+- Adicionada nova aba **Alarmes** à navegação principal.
+- Alarmes podem ser criados, editados, ativados, desativados e excluídos.
+- Cada alarme aceita nome opcional e repetição por dias da semana; sem dias selecionados, funciona como alarme único.
+- Alarmes únicos são desativados automaticamente depois do disparo; alarmes repetidos são reagendados para a próxima ocorrência.
+- Adicionado agendamento com `AlarmManager.setAlarmClock()` quando o acesso a alarmes exatos está disponível.
+- Em Android 12+ o app verifica `canScheduleExactAlarms()` e oferece acesso direto à tela **Alarmes e lembretes**.
+- Quando o acesso exato não está liberado, o alarme permanece agendado com fallback `setAndAllowWhileIdle()`, podendo sofrer atraso imposto pelo Android.
+- Adicionado pedido contextual da permissão de notificações no Android 13+.
+- Adicionado serviço de toque de alarme com áudio padrão do sistema em loop, vibração, limite de 5 minutos e notificação persistente com ação **Parar**.
+- Adicionado fallback de notificação sonora caso o Android impeça a inicialização do serviço de toque.
+- Alarmes ativos são restaurados após reinicialização, mudança manual de horário, mudança de fuso, atualização do aplicativo e concessão do acesso a alarmes exatos.
+- Lógica separada em modelo, codec, repositório, cálculo de horário, agendador, receivers, serviço e componentes Compose.
+- Adicionados testes unitários para serialização, padrões de repetição e cálculo do próximo disparo.
+- Mantida a regra do workflow que bloqueia arquivos Kotlin acima de 250 linhas.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.1.5
 
 - Adicionada seção de **Fusos horários** diretamente na tela Relógio, sem criar uma nova aba na navegação principal.

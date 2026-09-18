@@ -27,6 +27,7 @@ import com.example.relogioflutuante.ui.components.MainSection
 import com.example.relogioflutuante.ui.dialogs.AboutDialog
 import com.example.relogioflutuante.ui.layout.ScreenLayoutRules
 import com.example.relogioflutuante.ui.layout.ScreenWidthClass
+import com.example.relogioflutuante.ui.screens.AlarmScreen
 import com.example.relogioflutuante.ui.screens.ClockScreen
 import com.example.relogioflutuante.ui.screens.CountdownScreen
 import com.example.relogioflutuante.ui.screens.OverlayScreen
@@ -95,6 +96,7 @@ fun FloatingClockApp(permissionRefresh: Int) {
                     }
                 )
                 MainSection.COUNTDOWN -> CountdownScreen()
+                MainSection.ALARMS -> AlarmScreen(permissionRefresh)
                 MainSection.OVERLAY -> OverlayScreen(overlayActivation) {
                     setupFromMenu = true
                     showSetup = true

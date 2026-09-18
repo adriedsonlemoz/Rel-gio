@@ -26,6 +26,7 @@ import com.example.relogioflutuante.ui.theme.AppColors
 enum class MainSection(val label: String, @DrawableRes val iconRes: Int) {
     CLOCK("Relógio", R.drawable.ic_nav_clock),
     COUNTDOWN("Contagem", R.drawable.ic_nav_timer),
+    ALARMS("Alarmes", R.drawable.ic_nav_alarm),
     OVERLAY("Sobrepor", R.drawable.ic_nav_overlay)
 }
 
