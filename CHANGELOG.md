@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.3.2
+
+- Nova rodada de acabamento visual fino nas telas principais, sem alterar a lógica central do aplicativo.
+- Barra inferior redesenhada com seleção mais compacta, indicador sutil, transições leves de cor e melhor separação do conteúdo.
+- Card principal do horário ganhou maior profundidade, borda refinada, fundo em degradê discreto e selo superior para melhorar a hierarquia visual.
+- Tela `Sobrepor` recebeu card de status mais moderno com selo `ATIVO`, `PRONTO` ou `AJUSTAR`, melhor separação entre status, modo e ação principal.
+- Card de aparência foi reorganizado, com percentual de opacidade em selo próprio e bloco de bloqueio de posição mais legível.
+- Lista de alarmes ganhou cabeçalho com quantidade/estado dos alarmes e um estado vazio completo com ícone, título e orientação.
+- Alarmes desativados agora têm hierarquia visual mais clara, sem competir com alarmes ativos.
+- Botão `Adicionar alarme` recebeu cantos e proporções alinhados ao restante da interface.
+- Resumo de tempo restante dos alarmes passa a atualizar alinhado à virada do minuto, reduzindo atualizações periódicas desnecessárias.
+- Verificação passiva do estado externo do overlay reduzida de 1 segundo para 2 segundos, diminuindo trabalho periódico sem afetar as ações diretas do usuário.
+- Mantidas animações apenas em componentes pequenos da navegação, evitando transições pesadas.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.3.1
 
 - Substituído o menu suspenso do cabeçalho por uma folha inferior mais elegante e estável, eliminando a sensação de abertura deslocada para a esquerda.

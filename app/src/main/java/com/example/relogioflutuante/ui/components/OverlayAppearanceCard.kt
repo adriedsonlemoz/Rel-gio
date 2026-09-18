@@ -14,6 +14,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -40,11 +41,28 @@ fun OverlayAppearanceCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("Aparência da janela", color = AppColors.TextPrimary, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(12.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Aparência", color = AppColors.TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text("Ajuste sem sair do jogo", color = AppColors.TextSecondary, fontSize = 11.sp)
+                }
+                Surface(
+                    color = AppColors.Accent.copy(alpha = 0.13f),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(
+                        "${appearance.opacityPercent}%",
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
+                        color = AppColors.AccentSoft,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+            Spacer(Modifier.height(14.dp))
             Text("Formato", color = AppColors.TextSecondary, fontSize = 12.sp)
             Spacer(Modifier.height(5.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -60,11 +78,8 @@ fun OverlayAppearanceCard(
                 SizeChip("Médio", OverlaySize.MEDIUM, appearance, onSizeChange)
                 SizeChip("Grande", OverlaySize.LARGE, appearance, onSizeChange)
             }
-            Spacer(Modifier.height(13.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Opacidade", color = AppColors.TextPrimary, modifier = Modifier.weight(1f))
-                Text("${appearance.opacityPercent}%", color = AppColors.AccentSoft, fontWeight = FontWeight.SemiBold)
-            }
+            Spacer(Modifier.height(14.dp))
+            Text("Opacidade", color = AppColors.TextSecondary, fontSize = 12.sp)
             Slider(
                 value = appearance.opacityPercent.toFloat(),
                 onValueChange = { onOpacityChange(it.roundToInt()) },
@@ -77,25 +92,34 @@ fun OverlayAppearanceCard(
                     inactiveTickColor = AppColors.SurfaceStrong
                 )
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("Bloquear posição", color = AppColors.TextPrimary)
-                    Text(
-                        "Bloqueado, o relógio não intercepta toques do jogo.",
-                        color = AppColors.TextSecondary,
-                        fontSize = 11.sp,
-                        lineHeight = 15.sp
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = AppColors.SurfaceStrong.copy(alpha = 0.72f),
+                shape = RoundedCornerShape(15.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Bloquear posição", color = AppColors.TextPrimary, fontWeight = FontWeight.Medium)
+                        Text(
+                            if (appearance.positionLocked) "Toques passam direto para o jogo." else "Permite mover e fechar a janela.",
+                            color = AppColors.TextSecondary,
+                            fontSize = 11.sp,
+                            lineHeight = 15.sp
+                        )
+                    }
+                    Switch(
+                        checked = appearance.positionLocked,
+                        onCheckedChange = onLockedChange,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = AppColors.TextPrimary,
+                            checkedTrackColor = AppColors.Accent,
+                            uncheckedTrackColor = AppColors.SurfaceStrong
+                        )
                     )
                 }
-                Switch(
-                    checked = appearance.positionLocked,
-                    onCheckedChange = onLockedChange,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = AppColors.TextPrimary,
-                        checkedTrackColor = AppColors.Accent,
-                        uncheckedTrackColor = AppColors.SurfaceStrong
-                    )
-                )
             }
         }
     }
@@ -116,11 +140,12 @@ private fun StyledChip(label: String, selected: Boolean, onClick: () -> Unit) {
     FilterChip(
         selected = selected,
         onClick = onClick,
-        label = { Text(label) },
+        shape = RoundedCornerShape(12.dp),
+        label = { Text(label, fontSize = 11.sp) },
         colors = FilterChipDefaults.filterChipColors(
             containerColor = AppColors.SurfaceStrong,
             labelColor = AppColors.TextSecondary,
-            selectedContainerColor = AppColors.Accent.copy(alpha = 0.28f),
+            selectedContainerColor = AppColors.Accent.copy(alpha = 0.25f),
             selectedLabelColor = AppColors.AccentSoft
         )
     )

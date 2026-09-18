@@ -64,6 +64,7 @@ Quando a posição está desbloqueada, a janela pode ser arrastada e fechada. De
 ## Desempenho
 
 Relógio, contagem e overlays atualizam apenas na virada do segundo. O serviço evita redesenhar conteúdo que não mudou. A aparência do overlay é aplicada somente quando uma configuração é alterada. O serviço de Acessibilidade deixa de manter ticker ativo quando a janela está desativada e acorda por mudanças nas preferências. A capacidade de sobreposição é lida uma única vez por ciclo de retorno das Configurações e compartilhada entre as telas, reduzindo consultas repetidas ao sistema durante a troca de abas. A navegação do menu superior passou a usar uma folha inferior simples, evitando o popup lateral desalinhado e reduzindo recomposições visuais desnecessárias no cabeçalho.
+Os resumos relativos de alarmes agora são atualizados na virada do minuto, em vez de duas vezes por minuto, e a verificação passiva do estado externo do overlay foi reduzida para intervalos de 2 segundos; ações locais continuam atualizando imediatamente seus próprios estados de interface.
 
 ## Testes
 
@@ -116,8 +117,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.3.1`
-- `versionCode`: `21`
+- `versionName`: `1.3.2`
+- `versionCode`: `22`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada

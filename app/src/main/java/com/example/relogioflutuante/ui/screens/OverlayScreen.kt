@@ -54,7 +54,7 @@ fun OverlayScreen(
         while (true) {
             val next = OverlayRuntimeState(OverlayState.isEnabled(context), OverlayState.presentation(context))
             if (value != next) value = next
-            delay(1_000L)
+            delay(2_000L)
         }
     }
 

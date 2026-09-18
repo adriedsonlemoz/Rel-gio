@@ -1,18 +1,24 @@
 package com.example.relogioflutuante.ui.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,11 +38,14 @@ enum class MainSection(val label: String, @DrawableRes val iconRes: Int) {
 
 @Composable
 fun MainBottomNavigation(section: MainSection, onSectionChange: (MainSection) -> Unit) {
-    Surface(color = AppColors.Surface) {
+    Surface(
+        color = AppColors.Surface.copy(alpha = 0.98f),
+        shadowElevation = 10.dp
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 5.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             MainSection.entries.forEach { item ->
                 NavigationItem(
@@ -51,29 +60,51 @@ fun MainBottomNavigation(section: MainSection, onSectionChange: (MainSection) ->
 }
 
 @Composable
-private fun NavigationItem(modifier: Modifier, item: MainSection, selected: Boolean, onClick: () -> Unit) {
-    val background = if (selected) AppColors.Accent.copy(alpha = 0.13f) else AppColors.Surface
-    val contentColor = if (selected) AppColors.AccentSoft else AppColors.TextSecondary
+private fun NavigationItem(
+    modifier: Modifier,
+    item: MainSection,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val background by animateColorAsState(
+        if (selected) AppColors.Accent.copy(alpha = 0.16f) else AppColors.Surface,
+        label = "navBackground"
+    )
+    val contentColor by animateColorAsState(
+        if (selected) AppColors.AccentSoft else AppColors.TextSecondary,
+        label = "navContent"
+    )
+    val indicatorWidth by animateDpAsState(if (selected) 24.dp else 0.dp, label = "navIndicator")
+
     Column(
         modifier = modifier
-            .padding(horizontal = 5.dp)
-            .clip(RoundedCornerShape(13.dp))
+            .padding(horizontal = 4.dp)
+            .clip(RoundedCornerShape(16.dp))
             .background(background)
             .clickable(onClick = onClick)
-            .padding(vertical = 5.dp),
+            .padding(top = 5.dp, bottom = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            painter = painterResource(item.iconRes),
-            contentDescription = item.label,
-            tint = contentColor,
-            modifier = Modifier.size(19.dp)
-        )
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                painter = painterResource(item.iconRes),
+                contentDescription = item.label,
+                tint = contentColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
         Text(
             item.label,
             color = contentColor,
             fontSize = 10.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+        )
+        Box(
+            Modifier
+                .padding(top = 3.dp)
+                .height(3.dp)
+                .size(width = indicatorWidth, height = 3.dp)
+                .background(AppColors.AccentSoft, CircleShape)
         )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.relogioflutuante.alarms.Alarm
@@ -51,7 +52,8 @@ fun AlarmScreen(
     val nowMillis by produceState(initialValue = System.currentTimeMillis()) {
         while (true) {
             value = System.currentTimeMillis()
-            delay(30_000L)
+            val untilNextMinute = 60_000L - (System.currentTimeMillis() % 60_000L)
+            delay(untilNextMinute.coerceAtLeast(1_000L))
         }
     }
 
@@ -110,6 +112,7 @@ fun AlarmScreen(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { editing = null; showEditor = true },
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
         ) { Text("+ Adicionar alarme") }
 
