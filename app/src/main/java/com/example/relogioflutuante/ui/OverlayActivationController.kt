@@ -26,6 +26,7 @@ data class OverlayActivationController(
     val enableSystemOverlay: () -> Unit,
     val enableAccessibilityOverlay: () -> Unit,
     val enableNotificationMode: () -> Unit,
+    val disableOverlay: () -> Unit,
     val openAppDetails: () -> Unit,
     val openAccessibilitySettings: () -> Unit,
     val openSystemOverlaySettings: () -> Unit,
@@ -87,6 +88,12 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
         }
     }
 
+
+    fun disableOverlay() {
+        OverlayState.setEnabled(context, false)
+        context.stopService(Intent(context, OverlayService::class.java))
+    }
+
     fun enableNotificationMode() {
         val notificationsGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             ContextCompat.checkSelfPermission(
@@ -134,6 +141,7 @@ fun rememberOverlayActivationController(permissionRefresh: Int): OverlayActivati
         enableSystemOverlay = ::enableSystemOverlay,
         enableAccessibilityOverlay = ::enableAccessibilityOverlay,
         enableNotificationMode = ::enableNotificationMode,
+        disableOverlay = ::disableOverlay,
         openAppDetails = navigator::openAppDetails,
         openAccessibilitySettings = navigator::openAccessibility,
         openSystemOverlaySettings = navigator::openOverlayPermission,

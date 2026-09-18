@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.3
+
+- Adicionado botão de ativação do relógio flutuante diretamente na tela Relógio.
+- A ativação não exige mais entrar primeiro na aba Sobrepor.
+- O botão principal muda automaticamente conforme o estado: configurações restritas, confirmação do passo 1, Acessibilidade, ativar e desativar.
+- Ao abrir Informações do app, o progresso do passo fica salvo para que o retorno mostre a próxima ação correta.
+- Ao voltar da Acessibilidade, o estado é reavaliado pelo `onResume` e a ativação pendente é concluída automaticamente quando possível.
+- O guia completo continua disponível pelo menu, mas deixou de bloquear a entrada inicial do aplicativo.
+- Adicionado `ClockOverlayActionResolver` para manter a regra de ativação fora da interface.
+- Adicionado `ClockOverlayActionCard` como componente isolado, evitando crescimento da tela principal.
+- Adicionado `ClockOverlayActionResolverTest` cobrindo os estados da ativação direta.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.1.2 (13)
 - Simplifica a ativação para um assistente objetivo de dois passos: configurações restritas e Acessibilidade.
 - Após a Acessibilidade ser detectada, oferece um único botão para ativar a janela e concluir.

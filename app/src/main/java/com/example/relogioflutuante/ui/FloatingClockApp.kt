@@ -36,7 +36,7 @@ fun FloatingClockApp(permissionRefresh: Int) {
     val context = LocalContext.current
     var section by rememberSaveable { mutableStateOf(MainSection.CLOCK) }
     var showAbout by remember { mutableStateOf(false) }
-    var showSetup by remember { mutableStateOf(!FirstRunState.isSetupComplete(context)) }
+    var showSetup by remember { mutableStateOf(false) }
     var setupFromMenu by remember { mutableStateOf(false) }
     val overlayActivation = rememberOverlayActivationController(permissionRefresh)
 
@@ -85,7 +85,14 @@ fun FloatingClockApp(permissionRefresh: Int) {
     ) { innerPadding ->
         ResponsiveContent(Modifier.padding(innerPadding)) {
             when (section) {
-                MainSection.CLOCK -> ClockScreen()
+                MainSection.CLOCK -> ClockScreen(
+                    permissionRefresh = permissionRefresh,
+                    controller = overlayActivation,
+                    onOpenSetup = {
+                        setupFromMenu = true
+                        showSetup = true
+                    }
+                )
                 MainSection.COUNTDOWN -> CountdownScreen()
                 MainSection.OVERLAY -> OverlayScreen(overlayActivation) {
                     setupFromMenu = true

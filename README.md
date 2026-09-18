@@ -15,12 +15,13 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Ao bloquear a posição, a janela usa `FLAG_NOT_TOUCHABLE`, deixando os toques passarem integralmente para o jogo.
 - Posição lembrada separadamente em retrato e paisagem.
 - Menu principal com `Permissões e configuração` e `Sobre`.
-- Tela de configuração inicial para orientar permissões e restrições de APK instalado fora da Play Store.
+- Ativação direta pela tela Relógio, sem precisar entrar primeiro na aba Sobrepor.
+- Guia completo de configuração disponível pelo menu para permissões e restrições de APK instalado fora da Play Store.
 - Reavaliação automática de permissões ao voltar das Configurações do Android.
 
 ## Primeiro uso e permissões
 
-Em APKs instalados fora da Play Store, algumas versões do Android exigem liberar manualmente **Permitir configurações restritas** antes de ativar um serviço de Acessibilidade. O app orienta esse processo e abre diretamente `Informações do app`; o usuário ainda precisa tocar no menu de três pontos e confirmar a opção, pois o Android não fornece API pública para concedê-la automaticamente.
+Em APKs instalados fora da Play Store, algumas versões do Android exigem liberar manualmente **Permitir configurações restritas** antes de ativar um serviço de Acessibilidade. A própria tela Relógio mostra o estado e conduz o processo: primeiro abre `Informações do app`, depois leva à Acessibilidade e, ao voltar, revalida o estado automaticamente. O usuário ainda precisa tocar no menu de três pontos e confirmar a opção, pois o Android não fornece API pública para concedê-la automaticamente.
 
 Depois, o app pode abrir diretamente a tela de Acessibilidade. Se a ativação tiver sido iniciada pelo botão principal do overlay, o app verifica o novo estado ao voltar e ativa a janela automaticamente quando possível.
 
@@ -49,7 +50,8 @@ O projeto inclui testes unitários para:
 - cálculo do deslocamento do relógio;
 - formatação da duração;
 - formatos do overlay;
-- escolha do método preferencial de sobreposição.
+- escolha do método preferencial de sobreposição;
+- fluxo do botão de ativação direta na tela Relógio.
 
 O GitHub Actions executa `:app:testDebugUnitTest` antes do APK. O workflow também impede arquivos Kotlin com mais de **250 linhas**, ajudando a evitar componentes e classes monolíticas.
 
@@ -77,9 +79,9 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.1.2`
-- `versionCode`: `12`
+- `versionName`: `1.1.3`
+- `versionCode`: `14`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
-Em instalações por APK, o primeiro uso orienta apenas dois passos: permitir configurações restritas nas Informações do app e ativar o serviço em Acessibilidade. Depois disso, a janela pode ser ativada com um único toque em **Ativar relógio sobre o jogo**.
+A ativação principal agora fica na própria tela Relógio. O botão muda conforme o estado: libera configurações restritas, leva à Acessibilidade e, quando tudo está pronto, ativa ou desativa a janela sobre o jogo. A aba Sobrepor fica focada nas opções avançadas do overlay.
