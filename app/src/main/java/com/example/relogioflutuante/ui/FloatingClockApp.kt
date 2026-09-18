@@ -22,10 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.relogioflutuante.state.FirstRunState
 import com.example.relogioflutuante.ui.components.AppHeader
+import com.example.relogioflutuante.ui.components.DONATION_PIX_KEY
 import com.example.relogioflutuante.ui.components.MainBottomNavigation
 import com.example.relogioflutuante.ui.components.MainSection
 import com.example.relogioflutuante.ui.dialogs.AboutDialog
@@ -42,6 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FloatingClockApp(permissionRefresh: Int) {
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     var section by rememberSaveable { mutableStateOf(MainSection.CLOCK) }
     var showAbout by remember { mutableStateOf(false) }
     var showSetup by remember { mutableStateOf(false) }
@@ -54,6 +58,10 @@ fun FloatingClockApp(permissionRefresh: Int) {
             snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar(message)
         }
+    }
+    val copyPix: () -> Unit = {
+        clipboardManager.setText(AnnotatedString(DONATION_PIX_KEY))
+        showMessage("PIX copiado")
     }
 
     if (showSetup) {
@@ -91,7 +99,8 @@ fun FloatingClockApp(permissionRefresh: Int) {
                     setupFromMenu = true
                     showSetup = true
                 },
-                onOpenAbout = { showAbout = true }
+                onOpenAbout = { showAbout = true },
+                onSupportPix = copyPix
             )
         },
         bottomBar = {
@@ -108,7 +117,8 @@ fun FloatingClockApp(permissionRefresh: Int) {
                         setupFromMenu = true
                         showSetup = true
                     },
-                    onMessage = showMessage
+                    onMessage = showMessage,
+                    onCopyPix = copyPix
                 )
                 MainSection.COUNTDOWN -> CountdownScreen()
                 MainSection.ALARMS -> AlarmScreen(permissionRefresh, showMessage)
@@ -124,7 +134,7 @@ fun FloatingClockApp(permissionRefresh: Int) {
         }
     }
 
-    if (showAbout) AboutDialog(onDismiss = { showAbout = false })
+    if (showAbout) AboutDialog(onDismiss = { showAbout = false }, onCopyPix = copyPix)
 }
 
 @Composable

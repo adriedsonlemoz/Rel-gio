@@ -14,7 +14,7 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Três tamanhos, opacidade ajustável e posição bloqueável.
 - Ao bloquear a posição, a janela usa `FLAG_NOT_TOUCHABLE`, deixando os toques passarem integralmente para o jogo.
 - Posição lembrada separadamente em retrato e paisagem.
-- Menu principal com `Permissões e configuração` e `Sobre`.
+- Menu principal refinado em folha inferior, com acesso a `Permissões e configuração`, `Sobre` e atalho de apoio via PIX.
 - Ativação direta pela tela Relógio, sem precisar entrar primeiro na aba Sobrepor.
 - Guia completo de configuração disponível pelo menu para permissões e restrições de APK instalado fora da Play Store.
 - Reavaliação automática de permissões ao voltar das Configurações do Android.
@@ -25,6 +25,7 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Aba Alarmes com criação, edição, ativação/desativação, exclusão, nome opcional e repetição por dias da semana.
 - Alarmes usam horário real do Android, podem tocar com áudio/vibração e são restaurados após reinicialização ou mudanças de horário/fuso.
 - Ícone próprio do aplicativo com variantes normal, redonda, adaptativa e monocromática, mantendo os elementos principais dentro da área segura dos launchers Android.
+- Card opcional de apoio ao projeto com chave PIX copiável (`adriedson@outlook.com`) e feedback visual ao copiar.
 
 ## Primeiro uso e permissões
 
@@ -62,7 +63,7 @@ Quando a posição está desbloqueada, a janela pode ser arrastada e fechada. De
 
 ## Desempenho
 
-Relógio, contagem e overlays atualizam apenas na virada do segundo. O serviço evita redesenhar conteúdo que não mudou. A aparência do overlay é aplicada somente quando uma configuração é alterada. O serviço de Acessibilidade deixa de manter ticker ativo quando a janela está desativada e acorda por mudanças nas preferências. A capacidade de sobreposição é lida uma única vez por ciclo de retorno das Configurações e compartilhada entre as telas, reduzindo consultas repetidas ao sistema durante a troca de abas.
+Relógio, contagem e overlays atualizam apenas na virada do segundo. O serviço evita redesenhar conteúdo que não mudou. A aparência do overlay é aplicada somente quando uma configuração é alterada. O serviço de Acessibilidade deixa de manter ticker ativo quando a janela está desativada e acorda por mudanças nas preferências. A capacidade de sobreposição é lida uma única vez por ciclo de retorno das Configurações e compartilhada entre as telas, reduzindo consultas repetidas ao sistema durante a troca de abas. A navegação do menu superior passou a usar uma folha inferior simples, evitando o popup lateral desalinhado e reduzindo recomposições visuais desnecessárias no cabeçalho.
 
 ## Testes
 
@@ -115,8 +116,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.3.0`
-- `versionCode`: `20`
+- `versionName`: `1.3.1`
+- `versionCode`: `21`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada

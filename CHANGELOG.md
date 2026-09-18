@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.1
+
+- Substituído o menu suspenso do cabeçalho por uma folha inferior mais elegante e estável, eliminando a sensação de abertura deslocada para a esquerda.
+- Menu rápido agora reúne `Permissões e configuração`, `Sobre` e `Apoiar com PIX` em uma navegação visualmente mais moderna.
+- Adicionado apoio ao projeto via PIX com a chave `adriedson@outlook.com`, copiável tanto pelo menu quanto pela tela principal e pela janela `Sobre`.
+- Ao copiar a chave PIX, o app informa `PIX copiado` por snackbar.
+- Adicionado card `Apoiar o projeto` na tela Relógio, com ação clara de copiar.
+- Melhorado o botão de mais opções no cabeçalho com acabamento visual mais consistente com o restante do app.
+- Mantido o foco em leveza visual e previsibilidade do topo da interface, reduzindo o aspecto de menu técnico improvisado.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.3.0
 
 - Refinamento visual amplo baseado na revisão do fluxo real em vídeo.
