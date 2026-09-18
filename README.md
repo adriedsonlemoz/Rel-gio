@@ -24,6 +24,7 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Cada fuso mostra `HH:mm:ss`, UTC, diferença para o fuso local e mudança de dia quando aplicável.
 - Aba Alarmes com criação, edição, ativação/desativação, exclusão, nome opcional e repetição por dias da semana.
 - Alarmes usam horário real do Android, podem tocar com áudio/vibração e são restaurados após reinicialização ou mudanças de horário/fuso.
+- Ícone próprio do aplicativo com variantes normal, redonda, adaptativa e monocromática, mantendo os elementos principais dentro da área segura dos launchers Android.
 
 ## Primeiro uso e permissões
 
@@ -114,8 +115,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.2.1`
-- `versionCode`: `18`
+- `versionName`: `1.2.2`
+- `versionCode`: `19`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
@@ -133,4 +134,6 @@ A versão 1.1.5 adiciona relógios mundiais dentro da tela Relógio. A seleção
 A versão 1.2.0 adiciona uma aba própria de alarmes, com alarmes únicos ou recorrentes, nome opcional, controle de ativação e integração com o agendamento do Android. O app orienta a liberação de alarmes exatos quando necessária e mantém fallback compatível quando essa permissão não está disponível.
 ## QA e permissões na versão 1.2.1
 A versão 1.2.1 revisa o fluxo de configuração do overlay. Android 13+ mantém o passo de configurações restritas quando necessário, com instruções de recuperação caso a opção demore a aparecer. Android 12 e anteriores seguem diretamente para Acessibilidade, evitando um passo inexistente nessas versões.
+## Ícone do aplicativo na versão 1.2.2
+A versão 1.2.2 integra o novo ícone do Relógio Flutuante aos recursos nativos do Android. O projeto inclui variantes por densidade, ícone redondo, Adaptive Icon para Android 8.0+ e versão monocromática para ícones temáticos no Android 13+. A arte principal foi mantida com margem de segurança para evitar cortes em máscaras circulares, squircle e outros formatos de launcher.
 

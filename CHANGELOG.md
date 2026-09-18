@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.2
+
+- Integrado novo ícone oficial do Relógio Flutuante ao aplicativo.
+- Adicionados recursos `mipmap` para todas as densidades Android suportadas pelo projeto.
+- Adicionados ícones normal e redondo para launchers antigos.
+- Adicionado Adaptive Icon para Android 8.0+ com fundo e primeiro plano separados.
+- Adicionado ícone monocromático para suporte a ícones temáticos no Android 13+.
+- Aplicada margem de segurança ao desenho para evitar que relógio, brilho e elementos principais sejam cortados por máscaras circulares, squircle ou formatos específicos de fabricantes.
+- `AndroidManifest.xml` agora referencia explicitamente `android:icon` e `android:roundIcon`.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.2.1
 
 - Revisado o fluxo de ativação do overlay na etapa final de QA.
