@@ -24,12 +24,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.relogioflutuante.alarms.Alarm
+import com.example.relogioflutuante.alarms.AlarmDefaults
 import com.example.relogioflutuante.alarms.AlarmFormatting
+import com.example.relogioflutuante.alarms.AlarmListRules
 import com.example.relogioflutuante.alarms.AlarmRepository
 import com.example.relogioflutuante.alarms.AlarmScheduler
 import com.example.relogioflutuante.alarms.AlarmSound
 import com.example.relogioflutuante.ui.components.AppScreenColumn
 import com.example.relogioflutuante.ui.components.InfoCard
+import com.example.relogioflutuante.ui.components.alarms.AlarmDefaultsCard
 import com.example.relogioflutuante.ui.components.alarms.AlarmListCard
 import com.example.relogioflutuante.ui.components.alarms.AlarmPermissionCard
 import com.example.relogioflutuante.ui.dialogs.alarms.AlarmEditorDialog
@@ -56,6 +59,10 @@ fun AlarmScreen(
             val untilNextMinute = 60_000L - (System.currentTimeMillis() % 60_000L)
             delay(untilNextMinute.coerceAtLeast(1_000L))
         }
+    }
+
+    val sortedAlarms = remember(alarms, nowMillis) {
+        AlarmListRules.sortedByNextTrigger(alarms, nowMillis)
     }
 
     val notificationLauncher = rememberLauncherForActivityResult(
@@ -92,7 +99,7 @@ fun AlarmScreen(
         )
 
         AlarmListCard(
-            alarms = alarms,
+            alarms = sortedAlarms,
             nowMillis = nowMillis,
             onToggle = { alarm, enabled ->
                 repository.setEnabled(alarm.id, enabled)?.let { updated ->
@@ -107,6 +114,25 @@ fun AlarmScreen(
                 repository.delete(alarm.id)
                 alarms = repository.all()
                 onMessage("Alarme excluído")
+            }
+        )
+
+        AlarmDefaultsCard(
+            alarms = alarms,
+            onRestore = { definition ->
+                repository.restoreDefault(definition)?.let { restored ->
+                    scheduler.schedule(restored)
+                    alarms = repository.all()
+                    onMessage("${definition.label} restaurado")
+                }
+            },
+            onRestoreAll = {
+                val restored = repository.restoreMissingDefaults()
+                restored.forEach(scheduler::schedule)
+                if (restored.isNotEmpty()) {
+                    alarms = repository.all()
+                    onMessage("${restored.size} alarmes padrão restaurados")
+                }
             }
         )
 

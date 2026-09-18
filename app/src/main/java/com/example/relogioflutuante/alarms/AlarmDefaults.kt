@@ -14,6 +14,12 @@ object AlarmDefaults {
         Definition(19, 55, "Zyrvorthian Zulanka")
     )
 
+    fun matches(alarm: Alarm, definition: Definition): Boolean =
+        alarm.label == definition.label && alarm.zoneId == BRASILIA_ZONE
+
+    fun findExisting(alarms: List<Alarm>, definition: Definition): Alarm? =
+        alarms.firstOrNull { matches(it, definition) }
+
     fun create(id: Long, definition: Definition): Alarm = Alarm(
         id = id,
         hour = definition.hour,

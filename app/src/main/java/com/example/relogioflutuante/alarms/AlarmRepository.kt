@@ -32,6 +32,16 @@ class AlarmRepository(context: Context) {
         return updated
     }
 
+    fun restoreDefault(definition: AlarmDefaults.Definition): Alarm? {
+        val current = all()
+        if (AlarmDefaults.findExisting(current, definition) != null) return null
+        val restored = AlarmDefaults.create(nextId(), definition)
+        save(restored)
+        return restored
+    }
+
+    fun restoreMissingDefaults(): List<Alarm> = AlarmDefaults.definitions.mapNotNull(::restoreDefault)
+
     fun ensureDefaultAlarms(): List<Alarm> {
         val current = all().toMutableList()
         val changed = migrateCorvithPreset(current).toMutableList()

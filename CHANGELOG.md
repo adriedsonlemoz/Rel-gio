@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.0
+
+- Alarmes ativos agora são ordenados automaticamente pelo próximo disparo real, respeitando o fuso individual de cada alarme.
+- Alarmes desativados ficam após os ativos para não competir visualmente com os próximos avisos.
+- Adicionada seção `Alarmes padrão` com os três eventos Zyrvorthian no horário de Brasília.
+- A seção informa individualmente se Corvith, Ortson e Zulanka estão presentes ou ausentes.
+- Cada preset ausente pode ser restaurado manualmente sem sobrescrever um alarme existente com o mesmo nome/fuso.
+- Quando mais de um preset estiver ausente, há ação para restaurar todos de uma vez.
+- Presets excluídos continuam excluídos; a restauração não acontece automaticamente depois da configuração inicial.
+- Mantido Corvith em 15:55, Ortson em 18:55 e Zulanka em 19:55, todos em `America/Sao_Paulo`.
+- Adicionado teste unitário para a ordenação por próximo disparo.
+- Atualizados README, CHANGELOG, `github-manager.json`, `versionName` e `versionCode`.
+
 ## 1.6.0
 
 - Removido o card de PIX da tela principal do Relógio; o apoio fica concentrado exclusivamente na área `Sobre`.

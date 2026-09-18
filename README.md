@@ -25,6 +25,8 @@ Aplicativo Android nativo em Kotlin + Jetpack Compose com relógio ajustável, c
 - Fusos horários salvos na própria tela Relógio, com catálogo pesquisável de cidades, reordenação e remoção.
 - Cada fuso mostra `HH:mm:ss`, UTC, diferença para o fuso local e mudança de dia quando aplicável.
 - Aba Alarmes com criação, edição, ativação/desativação, exclusão, nome opcional e repetição por dias da semana.
+- Alarmes ativos são ordenados automaticamente pelo próximo disparo; alarmes desativados ficam depois.
+- Área `Alarmes padrão` permite restaurar manualmente Corvith, Ortson e Zulanka quando algum preset estiver ausente, sem recriação automática após exclusão.
 - Cada alarme pode escolher som (alarme, toque, notificação ou silencioso), vibração e soneca de 5, 10 ou 15 minutos, ou deixar a soneca desativada.
 - Alarmes usam horário real do Android, podem tocar com áudio/vibração e são restaurados após reinicialização ou mudanças de horário/fuso.
 - Ícone próprio do aplicativo com variantes normal, redonda, adaptativa e monocromática, mantendo os elementos principais dentro da área segura dos launchers Android.
@@ -124,8 +126,8 @@ O workflow `.github/workflows/android-kotlin-apk.yml` executa testes, valida met
 
 ### Versão atual
 
-- `versionName`: `1.6.0`
-- `versionCode`: `25`
+- `versionName`: `1.7.0`
+- `versionCode`: `26`
 - APK: `Relogio-Flutuante.apk`
 
 ## Ativação simplificada
